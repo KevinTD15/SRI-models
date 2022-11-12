@@ -21,8 +21,11 @@ def NormalizeQuery(s):
         s = s.replace(a,b)
     return s
 
-def CleanToken(text):
-    tokenize = nltk.word_tokenize(NormalizeDoc(text))
+def CleanToken(text, flag = False):
+    if(flag):
+        tokenize = nltk.word_tokenize(NormalizeQuery(text))
+    else:
+        tokenize = nltk.word_tokenize(NormalizeDoc(text))
     cleanToken = []
     save = True
     for i in tokenize:       #tqdm(tokenize):
