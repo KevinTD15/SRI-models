@@ -1,18 +1,30 @@
 import numpy as np
 from tokenizer import *
-from sympy import Symbol
+from sympy import And, Symbol
 from sympy.logic.inference import satisfiable
 from sympy.logic.boolalg import to_dnf
+from sympy.logic import simplify_logic
 
 reserved = ["|", "&", "~", "(", ")"]
 
 def ToSymbol(normalizedQuery):
+    '''Funcion donde cada palabra de la consulta e convierte en un simbolo'''
     result = []
     for i in normalizedQuery:
         if(i not in reserved):
             result.append(Symbol(f'{i}'))
             
+def ToAndForm(normalizedQuery):
+    result = ''
+    for i in normalizedQuery:
+        if(i != normalizedQuery[len(normalizedQuery) - 1]):
+            result += i + ' & '
+        else:
+            result += i
+    return result
+            
 def DocXTerm(normalizedContent):
+    '''Se crea la matriz de documento contra ocurrencia o no de terminos'''
     terms = []
     for i in range(len(normalizedContent)):
         for j in normalizedContent[i]:
@@ -30,6 +42,7 @@ def DocXTerm(normalizedContent):
     return cq, terms
 
 def CreateExpresionList(queryFnd):
+    '''Funcion que defuelve una lisa en la que en cada elemento hay una expresion de la FND'''
     exprList = []
     for i in queryFnd.args:
         expr = satisfiable(i)
@@ -42,6 +55,7 @@ def CreateExpresionList(queryFnd):
     return exprList
 
 def SimFunc(docXTerm, exprList, content):
+    '''Funcion de similitud del modelo booleano'''
     docs = []
     count = -1   
     for d in docXTerm[0]:
@@ -49,21 +63,33 @@ def SimFunc(docXTerm, exprList, content):
         for expr in exprList:
             flag = True
             for e in expr:
-                ind = docXTerm[1].index(e.name)
-                if(d[ind] != expr[e]):
-                    flag = False  
-                    break
+                if(e.name in docXTerm[1]):
+                    ind = docXTerm[1].index(e.name)
+                    if(d[ind] != expr[e]):
+                        flag = False  
+                        break
+                else:
+                    flag = False
             if(flag):
-                docs.append(content[count])   
+                if(content[count] not in docs):
+                    docs.append(content[count])   
     return docs
         
-def ExcecuteModel(content, query):
+def ExcecuteModel(content, query, queryMode, coincidence):
+    '''Funcion principal de la ejecucion del modelo'''
     normalizedContent = CleanAllTokens(content)
-    normalizedQuery = NormalizeQuery(query)
+    if(queryMode == '2'):
+        normalizedQuery = NormalizeQuery(query)
+    elif(queryMode == '1'):
+        cleanedQuery = CleanToken(query, True)
+        normalizedQuery = ToAndForm(cleanedQuery)
     docXTerm = DocXTerm(normalizedContent)
     ToSymbol(normalizedQuery)
-    queryFnd = to_dnf(normalizedQuery, True)
-    exprList = CreateExpresionList(queryFnd)
+    queryFnd = to_dnf(normalizedQuery)
+    if(type(queryFnd) is And and coincidence == '1'):
+        exprList = [satisfiable(queryFnd)]
+    else:
+        exprList = CreateExpresionList(queryFnd)
     docs = SimFunc(docXTerm, exprList, content)
     return docs
     
