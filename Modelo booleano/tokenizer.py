@@ -28,15 +28,12 @@ def CleanToken(text, flag = False):
         tokenize = nltk.word_tokenize(NormalizeDoc(text))
     cleanToken = []
     save = True
-    for i in tokenize:       #tqdm(tokenize):
+    for i in tokenize:
         for word in stopwords.words('spanish'):
-            #i = i.lower()
             if (word.lower() == i.lower()):
-                #si existe no lo guarda
                 save = False
         if (save):
             if (len(i) > 2):
-                #guarda las palabras que no estan en stopwords y saca caracteres como: ".," etc
                 cleanToken.append(i.lower())
         save = True
     return cleanToken
