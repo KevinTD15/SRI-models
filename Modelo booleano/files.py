@@ -33,8 +33,12 @@ def Read(path):
             return name+ ReadPDF(path)
     return ""
 
-def LoadFile(path):    
-    txt_docs = glob.glob(os.path.join(path, "*.txt"), recursive=True)
-    docs =  txt_docs
-    docs_text = [(doc_path , Read(doc_path),0) for doc_path in docs]
-    return docs_text
+def LoadFile(path):   
+    ext = ['txt','docx','doc','pdf']
+    docs = []
+    for i in ext: 
+        files = glob.glob(os.path.join(path, "*."+i), recursive=True)
+        if len(files)>0:
+            docs_text = [(doc_path , Read(doc_path),0) for doc_path in files]
+            docs.extend(docs_text)           
+    return docs
