@@ -3,7 +3,6 @@ from tokenizer import *
 from sympy import And, Symbol
 from sympy.logic.inference import satisfiable
 from sympy.logic.boolalg import to_dnf
-from sympy.logic import simplify_logic
 
 reserved = ["|", "&", "~", "(", ")"]
 
@@ -71,8 +70,8 @@ def SimFunc(docXTerm, exprList, content):
                 else:
                     flag = False
             if(flag):
-                if(content[count] not in docs):
-                    docs.append(content[count])   
+                if(content[count][0] not in docs):
+                    docs.append(content[count][0])   
     return docs
         
 def ExcecuteModel(content, query, queryMode, coincidence):
@@ -86,7 +85,9 @@ def ExcecuteModel(content, query, queryMode, coincidence):
     docXTerm = DocXTerm(normalizedContent)
     ToSymbol(normalizedQuery)
     queryFnd = to_dnf(normalizedQuery)
-    if(type(queryFnd) is And and coincidence == '1'):
+    if((type(queryFnd) is And) and coincidence == '2'):
+        exprList = CreateExpresionList(queryFnd)
+    elif(type(queryFnd) is And) or (hasattr(queryFnd, 'name') and queryFnd.name != None):
         exprList = [satisfiable(queryFnd)]
     else:
         exprList = CreateExpresionList(queryFnd)
