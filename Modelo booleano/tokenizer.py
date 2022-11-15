@@ -1,7 +1,5 @@
-from unicodedata import numeric
 import nltk
 from nltk.corpus import stopwords
-from tqdm import tqdm
 
 
 def NormalizeDoc(s):
@@ -33,7 +31,7 @@ def CleanToken(text, flag = False):
             if (word.lower() == i.lower()):
                 save = False
         if (save):
-            if (len(i) > 2):
+            if (len(i) > 1):
                 cleanToken.append(i.lower())
         save = True
     return cleanToken
@@ -41,5 +39,5 @@ def CleanToken(text, flag = False):
 def CleanAllTokens(content):
     result = []
     for i in content:
-        result.append(CleanToken(i))
+        result.append(CleanToken(i[1]))
     return result
