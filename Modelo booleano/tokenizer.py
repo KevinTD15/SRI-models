@@ -3,6 +3,7 @@ from nltk.corpus import stopwords
 
 
 def NormalizeDoc(s):
+    '''Funcion que normaliza cada documento. Ej: si el doc tiene -á- sera sustituida por -a-'''
     replacements = (
         ("á","a"), ("é","e"), ("í","i"), ("ó","o"), ("ú","u"), ("-", " "), (".", " "), ("_", " ")
     )
@@ -11,6 +12,7 @@ def NormalizeDoc(s):
     return s
 
 def NormalizeQuery(s):
+    '''Funcion que normaliza la consulta y la lleva a una expresion booleana.'''
     replacements = (
         ("á","a"), ("é","e"), ("í","i"), ("ó","o"), (" o "," | "), (" y ", " & "), ("ú","u"), ("-", " "), (".", " "), 
         ("_", " "), (" no ", " ~ "), (" de ", " & ")
@@ -20,6 +22,7 @@ def NormalizeQuery(s):
     return s
 
 def CleanToken(text, flag = False):
+    '''Funcion que elimina las palabras que -no aportan significado-, preposiciones, articulos, etc'''
     if(flag):
         tokenize = nltk.word_tokenize(NormalizeQuery(text))
     else:
@@ -37,6 +40,7 @@ def CleanToken(text, flag = False):
     return cleanToken
         
 def CleanAllTokens(content):
+    '''Funcion que itera por cada documento y llama a -CleanToken-'''
     result = []
     for i in content:
         result.append(CleanToken(i[1]))
