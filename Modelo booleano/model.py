@@ -14,6 +14,7 @@ def ToSymbol(normalizedQuery):
             result.append(Symbol(f'{i}'))
             
 def ToAndForm(normalizedQuery):
+    '''lleva una consulta en lenguaje natural a una consulta de solo AND entre sus terminos'''
     result = ''
     for i in normalizedQuery:
         if(i != normalizedQuery[len(normalizedQuery) - 1]):
