@@ -3,10 +3,12 @@ from PyPDF2 import PdfFileReader
 import os, glob
 
 def ReadTXT(path):
+    '''Funcion que recibe un .txt y devuelve su contenido'''
     txt = open(path,'r')
     return txt.read()
 
 def ReadDOCX(path):
+    '''Funcion que recibe un .docx y devuelve su contenido'''
     doc = Document(path)
     texto = ''
     for lee in doc.paragraphs:
@@ -14,6 +16,7 @@ def ReadDOCX(path):
     return texto
 
 def ReadPDF(path):
+    '''Funcion que recibe un .pdf y devuelve su contenido'''
     pdf = PdfFileReader(path)
     texto = ''
     for lee in range(pdf.getNumPages()):
@@ -21,6 +24,7 @@ def ReadPDF(path):
     return texto
    
 def Read(path):
+    '''Funcion que recibe un path y devuelve ese path junto al contenido del documento(su nombre tambien se incluye)'''
     if os.path.isfile(path):
         index = path.rfind('\\')
         dotIndex = path.rfind('.')
@@ -33,7 +37,8 @@ def Read(path):
             return name+ ReadPDF(path)
     return ""
 
-def LoadFile(path):   
+def LoadFile(path):  
+    '''Funcion que recibe el conjunto de path de los documentos y luego devuelve los documentos y su contenido asociado''' 
     ext = ['txt','docx','doc','pdf']
     docs = []
     for i in ext: 
