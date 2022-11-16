@@ -1,9 +1,9 @@
-from os import listdir
 from model import *
 import os
 from files import LoadFile
 
 def main():
+    '''Funcion principal del programa. Comienzo de la ejecucion'''
     fin = ''
     while(fin != '1'):
         flag = True
