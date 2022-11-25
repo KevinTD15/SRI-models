@@ -1,6 +1,6 @@
 import nltk
 from nltk.corpus import stopwords
-
+import time
 
 def NormalizeDoc(s):
     '''Funcion que normaliza cada documento. Ej: si el doc tiene -á- sera sustituida por -a-'''
@@ -30,7 +30,7 @@ def CleanToken(text, flag = False):
     cleanToken = []
     save = True
     for i in tokenize:
-        for word in stopwords.words('spanish'):
+        for word in stopwords.words('english'):
             if (word.lower() == i.lower()):
                 save = False
         if (save):
@@ -42,6 +42,18 @@ def CleanToken(text, flag = False):
 def CleanAllTokens(content):
     '''Funcion que itera por cada documento y llama a -CleanToken-'''
     result = []
+    #if(len(content) > 0 and type(content[0]) == str):
+    #    flag = True
+    #else:
+    #    flag = False
+    start = time.time()
+    end = 0
     for i in content:
+        #if(not flag):
+        #    result.append(CleanToken(i[1]))
+        #else:
+        if(end - start >= 99999999999):
+            return result
         result.append(CleanToken(i[1]))
+        end += time.time()
     return result
