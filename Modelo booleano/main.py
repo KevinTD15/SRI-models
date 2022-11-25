@@ -1,15 +1,28 @@
 from model import *
 import os
 from files import LoadFile
+import ir_datasets
 
 def main():
     '''Funcion principal del programa. Comienzo de la ejecucion'''
     fin = ''
     while(fin != '1'):
         flag = True
-        print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
-        path = input()
-        if os.path.exists(path):
+        print('Desea usar la base de datos de CRANFIELD?')
+        print('1 - Si')
+        print('2 - No')
+        cran = input()
+        if(cran == '1'):
+            content = []
+            dat = ir_datasets.load('cranfield')
+            for doc in dat.docs_iter():
+                content.append([doc.author + ' ' + doc.title, doc.author + ' ' + doc.title + ' ' + doc.text])
+        else:
+            print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
+            path = input()
+            content = LoadFile(path)
+            
+        if cran == '1' or os.path.exists(path):
             print('MODO DE CONSULTA. TECLEE 1 O 2:')
             print('1 - Casual')
             print('2 - Experto')
@@ -23,8 +36,6 @@ def main():
                 coincidence = input() 
             print('INGRESE LA CONSULTA DESEADA')
             query = input()
-
-            content = LoadFile(path)
 
             result = ExcecuteModel(content, query, queryMode, coincidence)
 
