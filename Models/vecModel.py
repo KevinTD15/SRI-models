@@ -4,10 +4,15 @@ from math import log10
 
 def FreqTableQuery(normalizedQuery, terms):
     cq = np.zeros(len(terms), int)
+    flag = False
     
     for i in range(len(terms)):
+        if(normalizedQuery.count(terms[i]) > 0):
+            flag = True
         cq[i] = normalizedQuery.count(terms[i])
     
+    if(not flag):
+        return 0
     return cq
     
 def FreqTable(normalizedContent):
@@ -87,13 +92,17 @@ def ExcecuteModelV(content, query):
     ft, term = FreqTable(normalizedContent)
     qft = FreqTableQuery(normalizeQuery, term)
     
-    normalizedFt = NormalizeFT(ft)
-    normalizedQft = NormalizeFTQuery(qft)
-    
-    idf = Idf(ft, term)
-    
-    wij = TFxIDF(normalizedFt, idf, term)
-    wiq = TFxIDFQuery(normalizedQft, idf)
+    if(type(qft) == int):
+        return []
+    else:   
+        
+        normalizedFt = NormalizeFT(ft)
+        normalizedQft = NormalizeFTQuery(qft)
 
-    docs = SimFunc(wij, wiq, content)
-    return docs
+        idf = Idf(ft, term)
+
+        wij = TFxIDF(normalizedFt, idf, term)
+        wiq = TFxIDFQuery(normalizedQft, idf)
+
+        docs = SimFunc(wij, wiq, content)
+        return docs
