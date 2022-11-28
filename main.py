@@ -1,8 +1,7 @@
-
-from Models.vecModel import *
-from Models.boolModel import *
-from Utilities.files import *
-from Utilities.tokenizer import *
+from Models.vecModel import ExcecuteModelV
+from Models.boolModel import ExcecuteModel
+from Models.fuzzyModel import ExcecuteModelF
+from Utilities.files import LoadFile 
 import os
 import ir_datasets
 
@@ -11,10 +10,12 @@ def main():
     fin = ''
     while(fin != '1'):
         flag = True
+        cQuery = '2'
         
         print('Modelo')
         print('1 - BOOLEANO') #AND
         print('2 - VECTORIAL') 
+        print('3 - FUZZY')
         mod = input()
         
         print('Desea usar la base de datos de CRANFIELD?')
@@ -22,6 +23,9 @@ def main():
         print('2 - No')
         cran = input()
         if(cran == '1'):
+            print('TECLEE RANGO DE LOS DOCUMENTOS')
+            low = int(input())
+            up = int(input())
             content = []
             cranQuery = []
             dat = ir_datasets.load('cranfield')
@@ -29,6 +33,8 @@ def main():
                 content.append([doc.author + ' ' + doc.title, doc.author + ' ' + doc.title + ' ' + doc.text])
             for q in dat.queries_iter():
                 cranQuery.append(q.text)
+            
+            content = content[low:up]
             
             print('DESEA USAR CONSULTAS DE CRANFIELD')
             print('1- Si')
@@ -47,28 +53,34 @@ def main():
             
         if cran == '1' or os.path.exists(path):
             
-            if(mod == '1'):
-                multResults = []    
+            if(mod == '1' or mod == '3'):
+                multResults = []                    
+                print('MODO DE CONSULTA. TECLEE 1 O 2:')
+                print('1 - Casual')
+                print('2 - Experto')
+                queryMode = input()
+                coincidence = '0'
+                
+                if(queryMode == '1'):
+                    print('TIPO DE COINCIDENCIA. TECLEE 1 O 2:')
+                    print('1 - TOTAL') #AND
+                    print('2 - PARCIAL') #OR
+                    coincidence = input()
+                       
                 if(cQuery == '2'):
-                    print('MODO DE CONSULTA. TECLEE 1 O 2:')
-                    print('1 - Casual')
-                    print('2 - Experto')
-                    queryMode = input()
-
-                    coincidence = '0'
-                    if(queryMode == '1'):
-                        print('TIPO DE COINCIDENCIA. TECLEE 1 O 2:')
-                        print('1 - TOTAL') #AND
-                        print('2 - PARCIAL') #OR
-                        coincidence = input()
-
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults.append(ExcecuteModel(content, query, queryMode, coincidence))
+                    if(mod == '1'):
+                        multResults.append(ExcecuteModel(content, query, queryMode, coincidence))
+                    else:
+                        multResults.append(ExcecuteModelF(content, query, queryMode, coincidence))
                 else:
                     query = cranQuery[int(cantIni):int(cantEnd)]
                     for q in query:
-                        multResults.append(ExcecuteModel(content, q, queryMode, coincidence))
+                        if(mod == '1'):
+                            multResults.append(ExcecuteModel(content, q, queryMode, coincidence))
+                        else:
+                            multResults.append(ExcecuteModelF(content, q, queryMode, coincidence))
                  
                 for j in range(len(multResults)):
                     print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
@@ -95,8 +107,8 @@ def main():
                         print('NO SE ENCONTRARON COINCIDENCIAS')
                     for i in multResults[j]:
                         if(i[1] != 0):
-                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
-            
+                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')           
+                
             flag = False
         
         if(flag):
