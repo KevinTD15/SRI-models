@@ -3,6 +3,7 @@ from Utilities.tokenizer import *
 from math import log10
 
 def FreqTableQuery(normalizedQuery, terms):
+    '''Tabla de frecuencia de los terminos de la query respecto a los del corpus'''
     cq = np.zeros(len(terms), int)
     flag = False
     
@@ -30,6 +31,7 @@ def FreqTable(normalizedContent):
     return cq, terms
 
 def NormalizeFTQuery(qft):
+    '''Normaliza los terminos de la query'''
     maxV = max(qft)
     return (list(map(lambda x: x / maxV, qft)))
 
@@ -46,6 +48,7 @@ def NormalizeFT(ft):
     return mappedFt
 
 def TFxIDFQuery(qtf, idf):
+    '''Se calcula la relevancia final'''
     result = []
     for i in range(len(qtf)):
         result.append(qtf[i] * idf[i])
@@ -72,13 +75,14 @@ def TFxIDF(tf, idf, term):
     return tf
    
 def SimFunc(docs, query, content):
+    '''Funcion de similitud donde se multiplica cada wij con los wiq'''
     result = []
     docAct = 0
     for i in docs:
         count = 0
         for j in range(len(i)):
             count += query[j] * i[j]
-        if([content[docAct][0], count] not in result and count > 0):
+        if([content[docAct][0], count] not in result and count >= 0.1):
             result.append([content[docAct][0], count])
         docAct += 1
     result.sort(key=lambda x : x[1], reverse=True)
