@@ -59,11 +59,8 @@ def Idf(normalizedContent, term):
     docs = len(normalizedContent) - 1
     result = []
     for i in range(len(term)):
-        count = 0
-        for j in normalizedContent:
-            if j[i] > 0:
-                count += 1
-        result.append(log10(docs/count))
+        nonZero = np.count_nonzero(normalizedContent[:,i])
+        result.append(log10(len(normalizedContent)/ nonZero))
     return result
 
 def TFxIDF(tf, idf, term):
@@ -82,7 +79,8 @@ def SimFunc(docs, query, content):
         count = 0
         for j in range(len(i)):
             count += query[j] * i[j]
-        if([content[docAct][0], count] not in result and count >= 0.1):
+        # and count >= 0.1 poner esto en el if para sesgar las relevancias
+        if([content[docAct][0], count] not in result):
             result.append([content[docAct][0], count])
         docAct += 1
     result.sort(key=lambda x : x[1], reverse=True)
