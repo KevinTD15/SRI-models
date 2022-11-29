@@ -1,6 +1,6 @@
 from Models.vecModel import ExcecuteModelV
 from Models.boolModel import ExcecuteModel
-from Models.fuzzyModel import ExcecuteModelF
+from Models.lsaModel import ExcecuteModelL
 from Utilities.files import LoadFile 
 import os
 import ir_datasets
@@ -15,7 +15,7 @@ def main():
         print('Modelo')
         print('1 - BOOLEANO') #AND
         print('2 - VECTORIAL') 
-        print('3 - FUZZY')
+        print('3 - LSA')
         mod = input()
         
         print('Desea usar la base de datos de CRANFIELD?')
@@ -53,7 +53,7 @@ def main():
             
         if cran == '1' or os.path.exists(path):
             
-            if(mod == '1' or mod == '3'):
+            if(mod == '1'):
                 multResults = []                    
                 print('MODO DE CONSULTA. TECLEE 1 O 2:')
                 print('1 - Casual')
@@ -70,20 +70,17 @@ def main():
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    if(mod == '1'):
-                        multResults.append(ExcecuteModel(content, query, queryMode, coincidence))
-                    else:
-                        multResults.append(ExcecuteModelF(content, query, queryMode, coincidence))
+                    multResults.append(ExcecuteModel(content, query, queryMode, coincidence))
                 else:
                     query = cranQuery[int(cantIni):int(cantEnd)]
                     for q in query:
-                        if(mod == '1'):
-                            multResults.append(ExcecuteModel(content, q, queryMode, coincidence))
-                        else:
-                            multResults.append(ExcecuteModelF(content, q, queryMode, coincidence))
+                        multResults.append(ExcecuteModel(content, q, queryMode, coincidence))
                  
                 for j in range(len(multResults)):
-                    print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
+                    if(type(query) == list):
+                        print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
+                    else:
+                        print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
                     if(len(multResults[j]) == 0):
                         print('NO SE ENCONTRARON COINCIDENCIAS')
                     for i, doc in enumerate(multResults[j]):
@@ -102,7 +99,35 @@ def main():
                         multResults.append(ExcecuteModelV(content, q))                
                 
                 for j in range(len(multResults)):
-                    print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
+                    if(type(query) == list):
+                        print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
+                    else:
+                        print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
+                    if(len(multResults[j]) == 0):
+                        print('NO SE ENCONTRARON COINCIDENCIAS')
+                    for i in multResults[j]:
+                        if(i[1] != 0):
+                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')   
+            
+            elif(mod == '3'):
+                multResults = []
+                print('TECLEE VALOR DE K')
+                k = input()
+                
+                if(cQuery == '2'):
+                    print('INGRESE LA CONSULTA DESEADA')
+                    query = input()
+                    multResults.append(ExcecuteModelL(content, query, int(k)))
+                else:                   
+                    query = cranQuery[int(cantIni):int(cantEnd)]
+                    for q in query:
+                        multResults.append(ExcecuteModelL(content, q, int(k)))                
+                
+                for j in range(len(multResults)):
+                    if(type(query) == list):
+                        print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
+                    else:
+                        print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
                     if(len(multResults[j]) == 0):
                         print('NO SE ENCONTRARON COINCIDENCIAS')
                     for i in multResults[j]:
