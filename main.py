@@ -23,9 +23,6 @@ def main():
         print('2 - No')
         cran = input()
         if(cran == '1'):
-            print('TECLEE RANGO DE LOS DOCUMENTOS')
-            low = int(input())
-            up = int(input())
             content = []
             cranQuery = []
             dat = ir_datasets.load('cranfield')
@@ -33,18 +30,11 @@ def main():
                 content.append([doc.author + ' ' + doc.title, doc.author + ' ' + doc.title + ' ' + doc.text])
             for q in dat.queries_iter():
                 cranQuery.append(q.text)
-            
-            content = content[low:up]
-            
+
             print('DESEA USAR CONSULTAS DE CRANFIELD')
             print('1- Si')
             print('2- No')
             cQuery = input()
-            
-            if(cQuery == '1'):
-                print('CUANTAS CONSULTAS REALIZAR. TECLEE UN RANGO DE NUMEROS')
-                cantIni = input()
-                cantEnd = input()
             
         else:
             print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
@@ -72,7 +62,7 @@ def main():
                     query = input()
                     multResults.append(ExcecuteModel(content, query, queryMode, coincidence))
                 else:
-                    query = cranQuery[int(cantIni):int(cantEnd)]
+                    query = cranQuery
                     for q in query:
                         multResults.append(ExcecuteModel(content, q, queryMode, coincidence))
                  
@@ -94,7 +84,7 @@ def main():
                     query = input()
                     multResults.append(ExcecuteModelV(content, query))
                 else:                   
-                    query = cranQuery[int(cantIni):int(cantEnd)]
+                    query = cranQuery
                     for q in query:
                         multResults.append(ExcecuteModelV(content, q))                
                 
@@ -119,7 +109,7 @@ def main():
                     query = input()
                     multResults.append(ExcecuteModelL(content, query, int(k)))
                 else:                   
-                    query = cranQuery[int(cantIni):int(cantEnd)]
+                    query = cranQuery
                     for q in query:
                         multResults.append(ExcecuteModelL(content, q, int(k)))                
                 
