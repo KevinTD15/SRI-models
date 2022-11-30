@@ -85,11 +85,12 @@ def ExcecuteModelL(content, query, k):
 
         idf = Idf(ft, term)
 
-        wij = TFxIDF(normalizedFt, idf, term)
+        wij = TFxIDF(normalizedFt, idf)
         wiq = TFxIDFQuery(normalizedQft, idf)
         
         #ftT = np.transpose(ft)
         wijT = np.transpose(wij)
+        wijT = np.nan_to_num(wijT)
         U, S, VT = np.linalg.svd(wijT)
         U = Acomodar(U, wijT.shape)
         Ur, Sr, VTr = ReduceDim(U, S, VT, k)
