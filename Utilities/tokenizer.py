@@ -28,25 +28,21 @@ def CleanToken(text, flag = False):
     else:
         tokenize = nltk.word_tokenize(NormalizeDoc(text))
     cleanToken = []
-    save = True
+    stop = set(stopwords.words('english'))
     for i in tokenize:
-        for word in stopwords.words('english'):
-            if (word.lower() == i.lower()):
-                save = False
-        if (save):
+        if not i.lower() in stop:
             if (len(i) > 1):
                 cleanToken.append(i.lower())
-        save = True
     return cleanToken
         
 def CleanAllTokens(content):
     '''Funcion que itera por cada documento y llama a -CleanToken-'''
     result = []
-    start = time.time()
-    end = 0
+    #start = time.time()
+    #end = 0
     for i in content:
-        if(end - start >= 99999999999):
-            return result
+        #if(end - start >= 99999999999):
+        #    return result
         result.append(CleanToken(i[1]))
-        end += time.time()
+        #end += time.time()
     return result
