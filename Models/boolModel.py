@@ -3,6 +3,7 @@ from Utilities.tokenizer import *
 from sympy import And, Symbol
 from sympy.logic.inference import satisfiable
 from sympy.logic.boolalg import to_dnf
+from functools import lru_cache
 
 reserved = ["|", "&", "~", "(", ")"]
 
@@ -22,24 +23,28 @@ def ToAndForm(normalizedQuery):
         else:
             result += i
     return result
-            
+
+@lru_cache()      
 def DocXTerm(normalizedContent):
     '''Se crea la matriz de documento contra ocurrencia o no de terminos'''
-    terms = []
+    terms = set()
+    normalizedContent = list([list(x) for x in normalizedContent])
+    
+    for i in normalizedContent:
+        terms.update(i)
+    term = list(terms)
+    
+    cq = np.zeros((len(normalizedContent), len(term)), int)
+    
     for i in range(len(normalizedContent)):
+        mark = set()
         for j in normalizedContent[i]:
-            if(j not in terms):
-                terms.append(j)        
-    
-    cq = np.empty((len(normalizedContent), len(terms)), int)
-    
-    for i in range(len(terms)):
-        for j in range(len(normalizedContent)):
-            if(terms[i] in normalizedContent[j]):
-                cq[j][i] = 1
-            else:
-                cq[j][i] = 0
-    return cq, terms
+            if(j not in mark):
+                ind = term.index(j)
+                cq[i][ind] = 1
+                mark.add(j)
+      
+    return cq, term
 
 def CreateExpresionList(queryFnd):
     '''Funcion que defuelve una lisa en la que en cada elemento hay una expresion de la FND'''
@@ -83,6 +88,7 @@ def ExcecuteModel(content, query, queryMode, coincidence):
     elif(queryMode == '1'):
         cleanedQuery = CleanToken(query, True)
         normalizedQuery = ToAndForm(cleanedQuery)
+    normalizedContent = tuple([tuple(x) for x in normalizedContent])
     docXTerm = DocXTerm(normalizedContent)
     ToSymbol(normalizedQuery)
     queryFnd = to_dnf(normalizedQuery)
