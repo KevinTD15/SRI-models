@@ -60,44 +60,48 @@ def main():
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults.append(ExcecuteModel(content, query, queryMode, coincidence))
+                    multResults = ExcecuteModel(content, query, queryMode, coincidence)
+                    print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
+                    for i in multResults:
+                            if(i[1] != 0):
+                                print(f'Articulo: {i}  \n')
                 else:
                     query = cranQuery
                     for q in query:
-                        multResults.append(ExcecuteModel(content, q, queryMode, coincidence))
-                 
-                for j in range(len(multResults)):
-                    if(type(query) == list):
-                        print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
-                    else:
-                        print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                    if(len(multResults[j]) == 0):
-                        print('NO SE ENCONTRARON COINCIDENCIAS')
-                    for i, doc in enumerate(multResults[j]):
-                        if(doc[1] != 0):
-                            print(i, '-', doc,  '\n') 
+                        multResults = ExcecuteModel(content, q, queryMode, coincidence)            
+                        if(type(query) == list):
+                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
+                        else:
+                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
+                        if(len(multResults) == 0):
+                            print('NO SE ENCONTRARON COINCIDENCIAS')
+                        for i in multResults:
+                            if(i[1] != 0):
+                                print(f'Articulo: {i}  \n') 
                 
             elif(mod == '2'):
                 multResults = []
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults.append(ExcecuteModelV(content, query))
+                    multResults = ExcecuteModelV(content, query)
+                    print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
+                    for i in multResults:
+                            if(i[1] != 0):
+                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
                 else:                   
                     query = cranQuery
                     for q in query:
-                        multResults.append(ExcecuteModelV(content, q))                
-                
-                for j in range(len(multResults)):
-                    if(type(query) == list):
-                        print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
-                    else:
-                        print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                    if(len(multResults[j]) == 0):
-                        print('NO SE ENCONTRARON COINCIDENCIAS')
-                    for i in multResults[j]:
-                        if(i[1] != 0):
-                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')   
+                        multResults = ExcecuteModelV(content, q)            
+                        if(type(query) == list):
+                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
+                        else:
+                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
+                        if(len(multResults) == 0):
+                            print('NO SE ENCONTRARON COINCIDENCIAS')
+                        for i in multResults:
+                            if(i[1] != 0):
+                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')   
             
             elif(mod == '3'):
                 multResults = []
@@ -107,22 +111,25 @@ def main():
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults.append(ExcecuteModelL(content, query, int(k)))
-                else:                   
-                    query = cranQuery
-                    for q in query:
-                        multResults.append(ExcecuteModelL(content, q, int(k)))                
-                
-                for j in range(len(multResults)):
-                    if(type(query) == list):
-                        print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
-                    else:
-                        print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                    if(len(multResults[j]) == 0):
-                        print('NO SE ENCONTRARON COINCIDENCIAS')
-                    for i in multResults[j]:
+                    multResults = ExcecuteModelL(content, query, int(k))
+                    print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
+                    for i in multResults:
                         if(i[1] != 0):
-                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')           
+                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
+                else:          
+                    query = cranQuery         
+                    multResults = ExcecuteModelL(content, query, int(k))              
+                
+                    for j in range(len(multResults)):
+                        if(type(cranQuery) == list):
+                            print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
+                        else:
+                            print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
+                        if(len(multResults[j]) == 0):
+                            print('NO SE ENCONTRARON COINCIDENCIAS')
+                        for i in multResults[j]:
+                            if(i[1] != 0):
+                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')           
                 
             flag = False
         
