@@ -71,36 +71,33 @@ def SimFunc(docVec, queryVec, content):
 
 def ExcecuteModelL(content, query, k):
     normalizedContent = CleanAllTokens(content)
-    normalizeQuery = CleanToken(query, True)
     
-    ft, term = FreqTable(normalizedContent)
-    qft = FreqTableQuery(normalizeQuery, term)
     
-    if(type(qft) == int):
-        return []
-    else:   
-        
-        normalizedFt = NormalizeFT(ft)
+    normalizedContent = tuple([tuple(x) for x in normalizedContent])
+    wij, term, idf = FreqTable(normalizedContent)
+    wijT = np.transpose(wij)
+    wijT = np.nan_to_num(wijT)
+    U, S, VT = np.linalg.svd(wijT)
+    U = Acomodar(U, wijT.shape)
+    Ur, Sr, VTr = ReduceDim(U, S, VT, k)
+    Sr = ToMatrix(Sr)
+    Vr = np.transpose(VTr)
+    docVec = GetDocVector(Vr)
+    Sinv = np.linalg.inv(Sr)
+    UrT = np.transpose(Ur)
+    aux = np.dot(Sinv, UrT)
+    
+    #if(type(qft) == int):
+    #    return []
+    #else:
+    docs = []
+    for q in query:   
+        normalizeQuery = CleanToken(q, True)
+        qft = FreqTableQuery(normalizeQuery, term)
         normalizedQft = NormalizeFTQuery(qft)
+        wiq = TFxIDFQuery(normalizedQft, idf) 
 
-        idf = Idf(ft, term)
-
-        wij = TFxIDF(normalizedFt, idf)
-        wiq = TFxIDFQuery(normalizedQft, idf)
-        
-        #ftT = np.transpose(ft)
-        wijT = np.transpose(wij)
-        wijT = np.nan_to_num(wijT)
-        U, S, VT = np.linalg.svd(wijT)
-        U = Acomodar(U, wijT.shape)
-        Ur, Sr, VTr = ReduceDim(U, S, VT, k)
-        Sr = ToMatrix(Sr)
-        Vr = np.transpose(VTr)
-        docVec = GetDocVector(Vr)
-        Sinv = np.linalg.inv(Sr)
-        UrT = np.transpose(Ur)
-        #wiqT = np.transpose(wiq)
-        aux = np.dot(Sinv, UrT)
         queryVec = np.dot(aux, wiq)
-        docs = SimFunc(docVec, queryVec, content)
-        return docs
+        docs.append(SimFunc(docVec, queryVec, content))
+    return docs
+
