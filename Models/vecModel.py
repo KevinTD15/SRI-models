@@ -1,7 +1,8 @@
 import numpy as np
 from Utilities.tokenizer import *
 from math import log10
-import time
+from functools import lru_cache
+from collections import Counter
 
 def FreqTableQuery(normalizedQuery, terms):
     '''Tabla de frecuencia de los terminos de la query respecto a los del corpus'''
@@ -20,43 +21,50 @@ def FreqTableQuery(normalizedQuery, terms):
     if(not flag):
         return 0
     return cq
-    
+
+@lru_cache()
 def FreqTable(normalizedContent):
     '''Se crea la tabla de frecuencia'''
     terms = set()
 
+    normalizedContent = list([list(x) for x in normalizedContent])
+    
     for i in normalizedContent:
         terms.update(i)
         
     term = list(terms)    
 
-    cq = np.zeros((len(normalizedContent), len(terms)), int)
-
+    idf = np.zeros(len(term), float)
+    occurrence = np.zeros(len(term), int)
+    tf = np.zeros((len(normalizedContent), len(term)), float)
+    tfidf = np.zeros((len(normalizedContent), len(term)), float)
+    setList = []
+    
+    for i in normalizedContent:
+        setList.append(set(i))
+    
+    for i in range(len(term)):
+        for j in setList:
+            if(term[i] in j):
+                occurrence[i] += 1
+                idf[i] = log10(len(normalizedContent)/occurrence[i])
+        
     for j in range(len(normalizedContent)):
         mark = set()
-        for k in normalizedContent[j]:
-            if(k not in mark):
-                ind = term.index(k)
-                cq[j][ind] = normalizedContent[j].count(k)
-                mark.add(k)
-    return cq, terms
+        if(len(normalizedContent[j]) > 0):
+            maxV = Counter(normalizedContent[j]).most_common()[0][1]
+            for k in normalizedContent[j]:
+                if(k not in mark):
+                    ind = term.index(k)                    
+                    tf[j][ind] = normalizedContent[j].count(k) / maxV
+                    tfidf[j][ind] = idf[ind] * tf[j][ind]
+                    mark.add(k)               
+    return tfidf, terms, idf
 
 def NormalizeFTQuery(qft):
     '''Normaliza los terminos de la query'''
     maxV = max(qft)
     return (list(map(lambda x: x / maxV, qft)))
-
-def NormalizeFT(ft):
-    '''se dividen las ocurrencias de cada termino de un documento entre la maxima ocurrencia'''
-    maxV = []
-    mappedFt = []
-    for i in ft:
-        maxV.append(max(i))
-    
-    for i in range(len(ft)):
-        mappedFt.append(list(map(lambda x: x / maxV[i], ft[i])))
-    
-    return mappedFt
 
 def TFxIDFQuery(qtf, idf):
     '''Se calcula la relevancia final'''
@@ -65,58 +73,33 @@ def TFxIDFQuery(qtf, idf):
         result.append(qtf[i] * idf[i])
     return result
 
-def Idf(normalizedContent, term):
-    '''se construye la tabla de idf'''
-    docs = len(normalizedContent)
-    result = np.zeros(len(term))
-    for i in range(len(term)):
-        nonZero = np.count_nonzero(normalizedContent[:,i])
-        result[i] = log10(docs/ nonZero)
-    return result
-
-def TFxIDF(tf, idf):
-    '''se calcula la importancia del termino i en el documento j para todo termino y documento'''
-    cols = len(tf[0]) - 1
-    tf = np.array(tf)
-    for i in range(cols):
-        tf[:, i] = list(map(lambda x: x * idf[i], tf[:,i]))
-    return tf
    
 def SimFunc(docs, query, content):
     '''Funcion de similitud donde se multiplica cada wij con los wiq'''
     result = []
     docAct = 0
-    count = 0
+    #count = 0
     for i in docs:
-        count += np.dot(i, query)
+        count = np.dot(i, query)
         # and count >= 0.1 poner esto en el if para sesgar las relevancias
         if([content[docAct][0], count] not in result and count >= 1):
             result.append([content[docAct][0], count])
         docAct += 1
-        count = 0
+        #count = 0
     result.sort(key=lambda x : x[1], reverse=True)
     return result
 
 def ExcecuteModelV(content, query):
     '''inicio de la ejecucion del modelo'''  
-    start = time.time()
+
     normalizedContent = CleanAllTokens(content)
+    normalizedContent = tuple([tuple(x) for x in normalizedContent])
+    wij, term, idf = FreqTable(normalizedContent)
+
     normalizeQuery = CleanToken(query, True)
-    
-    ft, term = FreqTable(normalizedContent)
     qft = FreqTableQuery(normalizeQuery, term)
+    normalizedQft = NormalizeFTQuery(qft)
+    wiq = TFxIDFQuery(normalizedQft, idf)        
+    docs = SimFunc(wij, wiq, content)
     
-    if(type(qft) == int):
-        return []
-    else:   
-        
-        normalizedFt = NormalizeFT(ft)
-        normalizedQft = NormalizeFTQuery(qft)
-
-        idf = Idf(ft, term)
-
-        wij = TFxIDF(normalizedFt, idf)
-        wiq = TFxIDFQuery(normalizedQft, idf)
-        
-        docs = SimFunc(wij, wiq, content)
-        return docs
+    return docs
