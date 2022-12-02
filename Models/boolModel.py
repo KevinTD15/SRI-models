@@ -2,7 +2,7 @@ import numpy as np
 from Utilities.tokenizer import *
 from sympy import And, Symbol
 from sympy.logic.inference import satisfiable
-from sympy.logic.boolalg import to_dnf
+from sympy.logic.boolalg import to_dnf, is_dnf
 from functools import lru_cache
 
 reserved = ["|", "&", "~", "(", ")"]
@@ -10,7 +10,7 @@ reserved = ["|", "&", "~", "(", ")"]
 def ToSymbol(normalizedQuery):
     '''Funcion donde cada palabra de la consulta e convierte en un simbolo'''
     result = []
-    for i in normalizedQuery:
+    for i in normalizedQuery.split(' '):
         if(i not in reserved):
             result.append(Symbol(f'{i}'))
             
@@ -90,7 +90,14 @@ def ExcecuteModel(content, query, queryMode, coincidence):
         normalizedQuery = ToAndForm(cleanedQuery)
     normalizedContent = tuple([tuple(x) for x in normalizedContent])
     docXTerm = DocXTerm(normalizedContent)
-    ToSymbol(normalizedQuery)
+    #if(normalizedQuery == 'problems & heat & conduction & composite & slabs & solved & far'):
+    #    normalizedQuery = 'problems & heat & conduction & slabs & solved & far'
+    #ToSymbol(normalizedQuery)
+    #if is_dnf(normalizedQuery):
+    #    a=5
+    #else:
+    #   a=6
+    
     queryFnd = to_dnf(normalizedQuery)
     if((type(queryFnd) is And) and coincidence == '2'):
         exprList = CreateExpresionList(queryFnd)
