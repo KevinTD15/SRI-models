@@ -5,7 +5,7 @@ import time
 def NormalizeDoc(s):
     '''Funcion que normaliza cada documento. Ej: si el doc tiene -á- sera sustituida por -a-'''
     replacements = (
-        ("á","a"), ("é","e"), ("í","i"), ("ó","o"), ("ú","u"), ("-", " "), (".", " "), ("_", " ")
+        ("á","a"), ("é","e"), ("í","i"), ("ó","o"), ("ú","u"), ("-", " "), (".", " "), ("_", " "), ("/", " ")
     )
     for a,b in replacements:
         s = s.replace(a,b)
@@ -14,8 +14,8 @@ def NormalizeDoc(s):
 def NormalizeQuery(s):
     '''Funcion que normaliza la consulta y la lleva a una expresion booleana.'''
     replacements = (
-        ("á","a"), ("é","e"), ("í","i"), ("ó","o"), (" o "," | "), (" y ", " & "), ("ú","u"), ("-", " "), (".", " "), 
-        ("_", " "), (" no ", " ~ "), (" de ", " & ")
+        ("á","a"), ("é","e"), ("í","i"), ("ó","o"), (" o "," | "), (" y ", " & "), ("ú","u"), (".", " "), 
+        ("_", " "), (" no ", " ~ "), (" de ", " & "), ("/", " "), ("-", " ")
     )
     for a,b in replacements:
         s = s.replace(a,b)
