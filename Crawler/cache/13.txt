@@ -1,0 +1,2 @@
+https://apiwrite.geeksforgeeks.org/
+{"external-reviewers":"https://apiwrite.geeksforgeeks.org/external-reviewers/"}

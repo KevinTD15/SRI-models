@@ -1,0 +1,2 @@
+https://practiceapi.geeksforgeeks.org/
+{"version": 1}
