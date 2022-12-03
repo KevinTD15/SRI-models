@@ -2,7 +2,7 @@ import numpy as np
 from Utilities.tokenizer import *
 from sympy import And, Symbol
 from sympy.logic.inference import satisfiable
-from sympy.logic.boolalg import to_dnf, is_dnf
+from sympy.logic.boolalg import to_dnf
 from functools import lru_cache
 
 reserved = ["|", "&", "~", "(", ")"]
@@ -90,14 +90,7 @@ def ExcecuteModel(content, query, queryMode, coincidence):
         normalizedQuery = ToAndForm(cleanedQuery)
     normalizedContent = tuple([tuple(x) for x in normalizedContent])
     docXTerm = DocXTerm(normalizedContent)
-    #if(normalizedQuery == 'problems & heat & conduction & composite & slabs & solved & far'):
-    #    normalizedQuery = 'problems & heat & conduction & slabs & solved & far'
-    #ToSymbol(normalizedQuery)
-    #if is_dnf(normalizedQuery):
-    #    a=5
-    #else:
-    #   a=6
-    
+    ToSymbol(normalizedQuery)
     queryFnd = to_dnf(normalizedQuery)
     if((type(queryFnd) is And) and coincidence == '2'):
         exprList = CreateExpresionList(queryFnd)
