@@ -1,0 +1,11 @@
+Requerimientos de software:
+-python 3.10.7 
+-numpy 1.23.4 
+-sympy 1.11.1 
+-nltk 3.7
+-ir_datasets 0.5.4
+-requests 2.28.1
+-regex 2022.9.13
+-beautifulsoup4 4.11.1
+-docx 0.2.4
+-pypdf2 2.11.1
