@@ -82,7 +82,7 @@ def SimFunc(docs, query, content):
     for i in docs:
         count = np.dot(i, query)
         # and count >= 0.1 poner esto en el if para sesgar las relevancias
-        if([content[docAct][0], count] not in result and count >= 1):
+        if([content[docAct][0], count] not in result and count > 0):
             result.append([content[docAct][0], count])
         docAct += 1
         #count = 0
