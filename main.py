@@ -2,6 +2,7 @@ from Models.vecModel import ExcecuteModelV
 from Models.boolModel import ExcecuteModel
 from Models.lsaModel import ExcecuteModelL
 from Utilities.files import LoadFile 
+from Crawler.exeCrawler import callCrawler
 import os
 import ir_datasets
 
@@ -18,30 +19,48 @@ def main():
         print('3 - LSA')
         mod = input()
         
-        print('Desea usar la base de datos de CRANFIELD?')
+        print('Desea Crawlear')
         print('1 - Si')
         print('2 - No')
-        cran = input()
-        if(cran == '1'):
+        crw = input()
+        if(crw == '1'):
+            print('Teclee tiempo limite (segundos) para el proceso')
+            t = int(input())
+            _, _ = callCrawler(t)
+            direct = os.listdir('Crawler\cache')
             content = []
-            cranQuery = []
-            dat = ir_datasets.load('cranfield')
-            for doc in dat.docs_iter():
-                content.append([doc.author + ' ' + doc.title, doc.author + ' ' + doc.title + ' ' + doc.text])
-            for q in dat.queries_iter():
-                cranQuery.append(q.text)
-
-            print('DESEA USAR CONSULTAS DE CRANFIELD')
-            print('1- Si')
-            print('2- No')
-            cQuery = input()
+            for i in direct:
+                a = open('Crawler/cache/'+i,encoding='utf8', errors='ignore')
+                b = a.readlines()
+                if(len(b) > 1):
+                    content.append([b[0], b[1]])
             
         else:
-            print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
-            path = input()
-            content = LoadFile(path)
+        
+            print('Desea usar la base de datos de CRANFIELD?')
+            print('1 - Si')
+            print('2 - No')
+            cran = input()
+            if(cran == '1'):
+                content = []
+                cranQuery = []
+                dat = ir_datasets.load('cranfield')
+                for doc in dat.docs_iter():
+                    content.append([doc.author + ' ' + doc.title, doc.author + ' ' + doc.title + ' ' + doc.text])
+                for q in dat.queries_iter():
+                    cranQuery.append(q.text)
+
+                print('DESEA USAR CONSULTAS DE CRANFIELD')
+                print('1- Si')
+                print('2- No')
+                cQuery = input()
+                
+            else:
+                print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
+                path = input()
+                content = LoadFile(path)
             
-        if cran == '1' or os.path.exists(path):
+        if crw == '1' or cran == '1' or os.path.exists(path):
             
             if(mod == '1'):
                 multResults = []                    
@@ -111,9 +130,13 @@ def main():
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults = ExcecuteModelL(content, query, int(k))
+                    multResults = ExcecuteModelL(content, [query], int(k))
                     print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
                     for i in multResults:
+                        if(type(i) == list):
+                            for j in i:
+                                if(j[1] != 0):
+                                    print(f'Relevancia: {j[1]} --- Articulo: {j[0]}  \n')
                         if(i[1] != 0):
                             print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
                 else:          
