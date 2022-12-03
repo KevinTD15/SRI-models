@@ -17,20 +17,13 @@ def DeleteIndex(vecProps, value):
     return result
 
 def ReduceS(S, indexToDelete):
-    for i in indexToDelete:
-        S = np.delete(S, i)
-    return S
+    return np.delete(S, indexToDelete)
     
 def ReduceVT(DT, indexToDelete):
-    for i in indexToDelete:
-        DT = np.delete(DT, i, axis=0)
-        #DT = np.delete(DT, i, axis=1)
-    return DT
+    return np.delete(DT, indexToDelete, axis=0)
 
 def ReduceU(T, indexToDelete):
-    for i in indexToDelete:
-        T = np.delete(T, i, axis=1)
-    return T
+    return np.delete(T, indexToDelete, axis=1)
 
 def ReduceDim(U, S, VT, value):
     vecProps = GetVectors(S)
@@ -71,8 +64,6 @@ def SimFunc(docVec, queryVec, content):
 
 def ExcecuteModelL(content, query, k):
     normalizedContent = CleanAllTokens(content)
-    
-    
     normalizedContent = tuple([tuple(x) for x in normalizedContent])
     wij, term, idf = FreqTable(normalizedContent)
     wijT = np.transpose(wij)
