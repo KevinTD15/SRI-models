@@ -78,14 +78,15 @@ def SimFunc(docs, query, content):
     '''Funcion de similitud donde se multiplica cada wij con los wiq'''
     result = []
     docAct = 0
-    #count = 0
     for i in docs:
-        count = np.dot(i, query)
+        dotProd = np.dot(i, query)
+        eucDistQ = np.linalg.norm(query)
+        eucDistD = np.linalg.norm(i)
+        relevance = dotProd / (eucDistQ * eucDistD)
         # and count >= 0.1 poner esto en el if para sesgar las relevancias
-        if([content[docAct][0], count] not in result and count > 0):
-            result.append([content[docAct][0], count])
+        if([content[docAct][0], relevance] not in result and relevance > 0):
+            result.append([content[docAct][0], relevance])
         docAct += 1
-        #count = 0
     result.sort(key=lambda x : x[1], reverse=True)
     return result
 
