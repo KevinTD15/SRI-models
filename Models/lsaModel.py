@@ -78,9 +78,6 @@ def ExcecuteModelL(content, query, k):
     UrT = np.transpose(Ur)
     aux = np.dot(Sinv, UrT)
     
-    #if(type(qft) == int):
-    #    return []
-    #else:
     docs = []
     for q in query:   
         normalizeQuery = CleanToken(q, True)
