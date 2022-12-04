@@ -63,11 +63,13 @@ def main():
         if crw == '1' or cran == '1' or os.path.exists(path):
             
             if(mod == '1'):
-                multResults = []                    
-                print('MODO DE CONSULTA. TECLEE 1 O 2:')
-                print('1 - Casual')
-                print('2 - Experto')
-                queryMode = input()
+                multResults = [] 
+                queryMode = '1' 
+                if(cQuery !='1'):                  
+                    print('MODO DE CONSULTA. TECLEE 1 O 2:')
+                    print('1 - Casual')
+                    print('2 - Experto')
+                    queryMode = input()
                 coincidence = '0'
                 
                 if(queryMode == '1'):
