@@ -10,53 +10,43 @@ Facultad de Matemática y Computación
 Universidad de La Habana
 Curso 2021-2022
 
-Modelo Booleano
-
-Resumen.  Pre-entrega del proyecto final de Sistemas de Recuperación de Información. Modelo Booleano implementado en Python. Este está compuesto por 3 módulos: Procesamiento de Texto, Modelado del SRI y el módulo principal donde se realizan las consultas en consola
-
 Manual de usuario:
 
-1-Comienzo de la ejecución: en la consola teclear python main.py
+--La ejecución se inicia al es escribir: python main.py en la consola
 
+1-	Modelos: Booleano, Vectorial, LSA.
 
-2- Tipo de modelo a usar( 1- Booleano, 2- Vectorial ):
+2-	Desea Crawlear: (Si ó no).
+
+  2.1-	Si se marcó “no” ir a paso (3).
   
- 
-3- Usar dataset de Cranfield ( 1- si, 2- no ):
-  Cranfield es un repositorio de 1400 atriculos cientificos perfecto para probar consultas
-
-
-4-(Si se marco 'no' en la opcion anterior) Path de donde se van a leer los documentos: en la consola teclear el path
-
-
-5-(Si el modelo a usar es 'booleano') Tipo de consulta( 1-Casual, 2-Experto ): 
-
-  Casual: teclear consulta en lenguaje natural
+  2.2-	Si se marcó “si” ir a paso (2.3).
   
-  Experto: teclear consulta usando operadores lógicos:
+  2.3-	Teclee tiempo límite: tiempo que desea que demore la ejecución del crawleado y si el modelo es el booleano ir al paso (5), sino ir al paso (7).
+
+3-	Desea usar base de datos de CRANFIELD: (Si ó no).
+
+  3.1-    Si se marcó “no” ir al paso (4).
   
-      & - and (el lenguaje también reconoce como and las palabras -y-, -de-)
-      
-      | - or (el lenguaje también reconoce como or la letra -o-)
-      
-      ~ - not (el lenguaje también reconoce como not la palabra -no-)
-      
-      
-6-(Si el modelo a usar es 'booleano') Tipo de coincidencia(1-Total, 2-Parcial)(Esta opcién solo se verá si la consulta es Casual):
+  3.2-    Si se marcó “si” ir al paso (3.3).
   
-  Total: Solo busca coincidencias exactas de los términos de la consulta con los de los coumentos (equivalente a hacer AND entre todos los términos de la consulta)
-  
-  Parcial: Busca coincidencias de cualqiuera de los términos de la consulta con los de los documentos (equivalente a hacer OR entre todos los términos de la         consulta)
+  3.3-    Desea usar consultas de CRANFIELD: (Si ó no):
+    
+    3.3.1-  Si se marcó “no” y se marcó modelo booleano ir al paso (5),     si no ir al paso (7).
+    
+    3.3.2-  Si se marcó “si” y se marcó modelo booleano ir al paso (6) y luego comienza la ejecución, en caso que sea otro modelo la ejecución comienza automáticamente.
 
+4-	Ingresar el path: Se tiene que poner una dirección válida de donde quiera realizar consultas en la PC. Si se marcó modelo booleano ir al paso (5), si no ir al paso (7).
 
-7- Ingresar consulta: Escribir la consulta en correspondencia con las opciones anteriormente seleccionadas
+5-	Modos de Consulta: (Solo modelo booleano) Se implementaron 2, el casual y el experto: El casual es para usuarios no versados en el álgebra booleana y que puedan escribir consultas en lenguaje natural.
+El experto es aquel que tiene al menos conocimientos básicos de lógica y puede escribir consultas con el formato de expresiones lógicas.
 
+6-	Tipo de coincidencia: (Solo modelo booleano) Se implementaron 2 tipos, la coincidencia parcial y la total.
+Esto solo afecta a las consultas de usuarios casuales, ya que el algoritmo al recibir una consulta en lenguaje natural es incapaz de detectar signos de agrupación. Ej:
+A y B o C puede ser interpretado como A y (B o C) ó (A y B) o C lo cual sería muy ambiguo.
+La propuesta para hacer una consulta más amigable es que el usuario decida si quiere encontrar coincidencias exactas de los términos (coincidencia total) y esto en programa sería poner operadores AND entre los pares de términos, o si desea coincidencias parciales, es decir, cualquier término de la consulta que aparezca en un documento, es parte de los documentos recuperados, esto se lleva a cabo poniendo operadores OR entre todos los pares de términos de la consulta.
 
-8-Visualización de los resultados
+7-	Teclear una consulta deseada en correspondencia con las opciones anteriores elegidas.
 
+8-	Se mostrarán los documentos recuperados.
 
-9-Final de la ejecucion(1-Final, 2- Hacer otra consulta):
-  
-  Final: Termina la ejecución del programa
-  
-  Hacer otra consulta: Permite hacer una nueva consulta comenzando el ciclo nuevamente
