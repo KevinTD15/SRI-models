@@ -9,3 +9,9 @@ Requerimientos de software:
 -beautifulsoup4 4.11.1
 -docx 0.2.4
 -pypdf2 2.11.1
+
+Nota:
+Para usar el Crawling es necesaio estar conectado a internet.
+OJO: Si el firewall está activado hay que darle conección a:
+	-vscode
+	-navegador(chrome, firefox, opera, etc)
