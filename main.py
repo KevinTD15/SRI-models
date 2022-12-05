@@ -1,10 +1,11 @@
+from CranfieldDataset.cranfield import Qrels, Dtest, Qtest
+from CranfieldDataset.metrics import Evaluate, F1, F
 from Models.vecModel import ExcecuteModelV
 from Models.boolModel import ExcecuteModel
 from Models.lsaModel import ExcecuteModelL
 from Utilities.files import LoadFile 
 from Crawler.exeCrawler import callCrawler
 import os
-import ir_datasets
 
 def main():
     '''Funcion principal del programa. Comienzo de la ejecucion'''
@@ -42,18 +43,14 @@ def main():
             print('2 - No')
             cran = input()
             if(cran == '1'):
-                content = []
-                cranQuery = []
-                dat = ir_datasets.load('cranfield')
-                for doc in dat.docs_iter():
-                    content.append([doc.author + ' ' + doc.title, doc.author + ' ' + doc.title + ' ' + doc.text])
-                for q in dat.queries_iter():
-                    cranQuery.append(q.text)
+                content = Dtest()
+                cranQuery = Qtest()
 
                 print('DESEA USAR CONSULTAS DE CRANFIELD')
                 print('1- Si')
                 print('2- No')
                 cQuery = input()
+                qrels = Qrels()
                 
             else:
                 print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
@@ -105,46 +102,64 @@ def main():
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults = ExcecuteModelV(content, query)
+                    multResults, _ = ExcecuteModelV(content, [query])
                     print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
                     for i in multResults:
                             if(i[1] != 0):
                                 print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
                 else:                   
-                    query = cranQuery
-                    for q in query:
-                        multResults = ExcecuteModelV(content, q)            
-                        if(type(query) == list):
-                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
+                    multResults, dq = ExcecuteModelV(content, cranQuery)
+                    p, r = Evaluate(dq, qrels)
+                    fValue = F(p, r)
+                    f1Value = F1(p, r)
+                    print(f'Precision: {p}, Recobrado: {r}, F: {fValue}, F1: {f1Value} \n')
+                    for j in range(len(multResults)):
+                        if(type(cranQuery) == list):
+                            print(f'\nRESULTADOS DE LA CONSULTA: {cranQuery[j]}\n')
                         else:
-                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
-                        if(len(multResults) == 0):
+                            print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
+                        if(len(multResults[j]) == 0):
                             print('NO SE ENCONTRARON COINCIDENCIAS')
-                        for i in multResults:
+                        for i in multResults[j]:
                             if(i[1] != 0):
-                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')   
+                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n') 
+                        #if(type(query) == list):
+                        #    print(f'\nRESULTADOS DE LA CONSULTA: {query[q]}\n')
+                        #else:
+                        #    print(f'\nRESULTADOS DE LA CONSULTA: {query[q]}\n')
+                        #if(len(multResults) == 0):
+                        #    print('NO SE ENCONTRARON COINCIDENCIAS')
+                        #for i in multResults:
+                        #    if(i[1] != 0):
+                        #        print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n') 
+                    
             
             elif(mod == '3'):
                 multResults = []
                 print('TECLEE VALOR DE K')
                 k = input()
-                
+
                 if(cQuery == '2'):
                     print('INGRESE LA CONSULTA DESEADA')
                     query = input()
-                    multResults = ExcecuteModelL(content, [query], int(k))
+                    multResults, _ = ExcecuteModelL(content, [query], int(k))
                     print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
                     for i in multResults:
                         if(type(i) == list):
                             for j in i:
                                 if(j[1] != 0):
                                     print(f'Relevancia: {j[1]} --- Articulo: {j[0]}  \n')
-                        if(i[1] != 0):
+                        if(len(i) == 0):
+                            print(f'NO SE ENCONTRARON COINCIDENCIAS\n')
+                        if(len(i) > 0 and i[1] != 0):
                             print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
                 else:          
                     query = cranQuery         
-                    multResults = ExcecuteModelL(content, query, int(k))              
-                
+                    multResults, dq = ExcecuteModelL(content, query, int(k)) 
+                    p, r = Evaluate(dq, qrels)
+                    fValue = F(p, r)
+                    f1Value = F1(p, r)
+                    print(f'Precision: {p}, Recobrado: {r}, F: {fValue}, F1: {f1Value} \n')
                     for j in range(len(multResults)):
                         if(type(cranQuery) == list):
                             print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
