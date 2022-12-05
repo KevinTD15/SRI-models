@@ -48,19 +48,21 @@ def ToMatrix(Sr):
 def Acomodar(VT, shape):
     return VT[0:shape[0], 0:shape[1]]
 
-def SimFunc(docVec, queryVec, content):
+def SimFunc(docVec, queryVec, content, q):
     result = []
     countAct = 0
+    dq = []
     for i in docVec:
         dotProd = np.dot(i[1], queryVec)
         eucDistQ = np.linalg.norm(queryVec)
         eucDistD = np.linalg.norm(i[1])
         relevance = dotProd / (eucDistQ * eucDistD)
-        if([content[countAct][0]] not in result and relevance > 0):
+        if([content[countAct][0]] not in result and relevance >= 0.5):
             result.append([content[countAct][0], relevance])
+            dq.append((countAct + 1, q + 1))
         countAct += 1
     result.sort(key=lambda x : x[1], reverse=True)
-    return result
+    return result, dq
 
 def ExcecuteModelL(content, query, k):
     normalizedContent = CleanAllTokens(content)
@@ -79,13 +81,16 @@ def ExcecuteModelL(content, query, k):
     aux = np.dot(Sinv, UrT)
     
     docs = []
-    for q in query:   
-        normalizeQuery = CleanToken(q, True)
+    dq = []
+    for q in range(len(query)):   
+        normalizeQuery = CleanToken(query[q], True)
         qft = FreqTableQuery(normalizeQuery, term)
         normalizedQft = NormalizeFTQuery(qft)
         wiq = TFxIDFQuery(normalizedQft, idf) 
 
         queryVec = np.dot(aux, wiq)
-        docs.append(SimFunc(docVec, queryVec, content))
-    return docs
+        relevantDocs, dqpos = SimFunc(docVec, queryVec, content, q)
+        docs.append(relevantDocs)
+        dq.append(dqpos)
+    return docs, dq
 
