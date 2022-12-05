@@ -5,7 +5,7 @@ import time
 import os
 
 def GetLinks(url):
-    return re.findall('"((http)s?://.*?)"', url)
+    return re.findall('"((http)s?://.*?|www\.\S+)"', url)
 
 def DeleteCommand(text, command):
     while(True):
@@ -16,7 +16,12 @@ def DeleteCommand(text, command):
         text = text.replace(text[start:end + command[1]], ' ', 1)
     return text
 
+def remove_html(text):
+    html_pattern = re.compile('<.*?>')
+    return html_pattern.sub(r'', text)
+
 def GetTextFromHtml(text):
+    #text = remove_html(text)
     commands = [('script', 9), ('span', 7), ('style', 8)]
     for i in commands:
         text = DeleteCommand(text, i)
