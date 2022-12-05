@@ -1,6 +1,6 @@
 # SRI-models
 
-En este repo se implementarán 3 sistemas de recuperacion de informacion, por ahora solo estará el modelo booleano y el vectorial
+En este repo están implementados 3 sistemas de recuperacion de informacion, el modelo booleano, el vectorial y el análisis de semántica latente
 
 Proyecto de Sistemas de Recuperación de Información
 Modelo booleano, vectorial y ...
