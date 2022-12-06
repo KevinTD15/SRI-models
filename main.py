@@ -105,6 +105,9 @@ def main():
                     multResults, _ = ExcecuteModelV(content, [query])
                     print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
                     for i in multResults:
+                        if(len(i) == 0):
+                            print('NO SE ENCONTRARON COINCIDENCIAS')
+                        else:
                             if(i[1] != 0):
                                 print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
                 else:                   
