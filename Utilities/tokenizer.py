@@ -1,5 +1,6 @@
 import nltk
 from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
 
 def NormalizeDoc(s):
     '''Funcion que normaliza cada documento. Ej: si el doc tiene -á- sera sustituida por -a-'''
@@ -29,8 +30,10 @@ def CleanToken(text, flag = False):
         #tokenize = (list(nltk.pos_tag(nltk.word_tokenize(NormalizeDoc(text)))))
         tokenize = nltk.word_tokenize(NormalizeDoc(text))
     cleanToken = []
+    lemmatizer  = WordNetLemmatizer()
     stop = set(stopwords.words('english'))
     for i in tokenize:
+        i = lemmatizer.lemmatize(i)
         if not i.lower() in stop:
             if (len(i) > 1):
                 cleanToken.append(i.lower())
