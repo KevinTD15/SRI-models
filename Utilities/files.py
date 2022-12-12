@@ -3,7 +3,7 @@ from PyPDF2 import PdfFileReader
 import os, glob
 import webbrowser
 
-def readSimple(path):
+def ReadSimple(path):
     '''Funcion que recibe un path y devuelve solo su contenido (solo txt y doc(x))'''
     #if os.path.isfile(path):
     if path.endswith('.txt'):   return ReadTXT(path)
