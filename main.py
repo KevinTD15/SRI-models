@@ -1,187 +1,333 @@
-from CranfieldDataset.cranfield import Qrels, Dtest, Qtest
-from CranfieldDataset.metrics import Evaluate, F1, F
-from Models.vecModel import ExcecuteModelV
-from Models.boolModel import ExcecuteModel
-from Models.lsaModel import ExcecuteModelL
-from Utilities.files import LoadFile 
-from Crawler.exeCrawler import callCrawler
-import os
+from tkinter import *
+from tkinter.messagebox import showinfo
+from tkinter import filedialog
+from Models.callModel import CallModel
+from Utilities.files import ReadSimple
+from Utilities.showDoc import Content
 
-def main():
-    '''Funcion principal del programa. Comienzo de la ejecucion'''
-    fin = ''
-    while(fin != '1'):
-        flag = True
-        cQuery = '2'
+class View():
+    def __init__(self):       
+        #crear ventana principal
+        self.root = Tk()
+        self.root.title("Modelos de SRI")
+        self.root.geometry("520x480"+"+"+str(10)+"+"+str(10)) 
+        self.root.resizable(1,1)
+        self.root.config(bg="blue",relief="sunken",bd=12) 
+        self.menuBar = Menu(self.root)
+        self.root.config(menu=self.menuBar)
+        self.InitializeMenu()
+
+        Label(text="Proyecto Final de SRI  2022\n\nIntegrante:\n Kevin Talavera Díaz C-311",bg="blue",fg="white",font=("arial",14),border=10,justify=CENTER).place(x=220,y=350)
+        self.vr = None
+        self.canvas = None
+        self.mod = None
+        self.path = StringVar()
+        self.queryMode = StringVar(value='1') 
+        self.crw = None
+        self.time = None
+        self.cran = None
+        self.radio1 = None
+        self.radio2 = None
+        self.query = None
+        self.k = IntVar(value=150)
+        self.umbralS = DoubleVar(value=0.5)
+        self.umbral = None
+        self.cQuery = None
+        self.modelName = None
+        self.coincidence = StringVar(value='0') 
+        self.button = None 
         
-        print('Modelo')
-        print('1 - BOOLEANO') #AND
-        print('2 - VECTORIAL') 
-        print('3 - LSA')
-        mod = input()
-        
-        print('Desea Crawlear')
-        print('1 - Si')
-        print('2 - No')
-        crw = input()
-        if(crw == '1'):
-            print('Teclee tiempo limite (segundos) para el proceso')
-            t = int(input())
-            _, _ = callCrawler(t)
-            direct = os.listdir('Crawler\cache')
-            content = []
-            for i in direct:
-                a = open('Crawler/cache/'+i,encoding='utf8', errors='ignore')
-                b = a.readlines()
-                if(len(b) > 1):
-                    content.append([b[0], b[1]])
-            
+        self.root.mainloop() 
+
+    def InitializeMenu(self):        
+        self.menuBar.add_cascade(label="Modelo Booleano", command=self.boolModel)
+        self.menuBar.add_cascade(label="Modelo Vectorial", command=self.vecModel)
+        self.menuBar.add_cascade(label="Modelo LSA", command=self.lsaModel)
+        self.menuBar.add_cascade(label="Salir", command=self.root.quit)
+
+    def CreateCanvas(self):
+        self.canvas= Canvas(self.root,bd=0,highlightthickness=0,bg="blue", relief="sunken",width=520,height=480)
+        self.canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
+        self.canvas.xview_moveto(0)
+        self.canvas.yview_moveto(0)
+        Label (text=self.modelName,bg="blue",fg="black",font=("arial",10)).place(x=150,y=2)
+
+    def InputData(self):
+        if self.canvas != None:
+            self.canvas.destroy()
+        self.CreateCanvas()  
+
+        self.cQuery = StringVar(value='2') 
+        Label (text="Desea Crawlear",bg="blue",fg="white",font=("arial",10)).place(x=20,y=20)
+        self.crw=StringVar(value='2') 
+        self.radio1=Radiobutton(text="sí",bg="blue",fg="white",font=("arial",10), variable=self.crw, value=1,command=self.ReadCrawling)
+        self.radio1.place(x=150,y=20)
+        self.radio2=Radiobutton(text="no",bg="blue",fg="white",font=("arial",10), variable=self.crw, value=2,command=self.ReadCrawling)
+        self.radio2.place(x=190,y=20)
+
+    def ReadCrawling(self):
+        self.radio1.configure(state="disable")
+        self.radio2.configure(state="disable")
+        if self.crw.get()=='1': 
+            self.time=IntVar()
+            Label(text="Teclee tiempo limite (segundos) para el proceso",bg="blue",fg="white",font=("arial",10)).place(x=20,y=60)
+            Entry(width=3,textvariable=self.time).place(x=310,y=60)
+            self.button = Button (text='ok',font=("arial",10),command=self.OtherInputData)
+            self.button.place(x=350,y=60)
         else:
-        
-            print('Desea usar la base de datos de CRANFIELD?')
-            print('1 - Si')
-            print('2 - No')
-            cran = input()
-            if(cran == '1'):
-                content = Dtest()
-                cranQuery = Qtest()
+            Label(text="Desea usar la base de datos de CRANFIELD",bg="blue",fg="white",font=("arial",10)).place(x=20,y=60)
+            self.cran = StringVar(value='2')
+            self.radio1=Radiobutton(text="sí",bg="blue",fg="white",font=("arial",10), variable=self.cran, value='1',command=self.ReadCranfield)
+            self.radio1.place(x=300,y=60)
+            self.radio2=Radiobutton(text="no",bg="blue",fg="white",font=("arial",10), variable=self.cran, value='2',command=self.ReadCranfield)
+            self.radio2.place(x=340,y=60)      
 
-                print('DESEA USAR CONSULTAS DE CRANFIELD')
-                print('1- Si')
-                print('2- No')
-                cQuery = input()
-                qrels = Qrels()
-                
-            else:
-                print('INGRESE EL PATH DONDE DESEA REALIZAR LA BUSQUEDA')
-                path = input()
-                content = LoadFile(path)
-            
-        if crw == '1' or cran == '1' or os.path.exists(path):
-            
-            if(mod == '1'):
-                multResults = [] 
-                queryMode = '1' 
-                if(cQuery !='1'):                  
-                    print('MODO DE CONSULTA. TECLEE 1 O 2:')
-                    print('1 - Casual')
-                    print('2 - Experto')
-                    queryMode = input()
-                coincidence = '0'
-                
-                if(queryMode == '1'):
-                    print('TIPO DE COINCIDENCIA. TECLEE 1 O 2:')
-                    print('1 - TOTAL') #AND
-                    print('2 - PARCIAL') #OR
-                    coincidence = input()
-                       
-                if(cQuery == '2'):
-                    print('INGRESE LA CONSULTA DESEADA')
-                    query = input()
-                    multResults = ExcecuteModel(content, query, queryMode, coincidence)
-                    print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                    for i in multResults:
-                            if(i[1] != 0):
-                                print(f'Articulo: {i}  \n')
+    def ReadCranfield(self):
+        self.radio1.configure(state="disable")
+        self.radio2.configure(state="disable")
+        if self.cran.get()=='1':  
+            Label(text="Desea usar consultas de CRANFIELD ?:",bg="blue",fg="white",font=("arial",10)).place(x=20,y=100)
+            self.radio1=Radiobutton(text="sí",bg="blue",fg="white",font=("arial",10), variable=self.cQuery, value='1', command=self.OtherInputData)
+            self.radio1.place(x=300,y=100)
+            self.radio2=Radiobutton(text="no",bg="blue",fg="white",font=("arial",10), variable=self.cQuery, value='2', command=self.OtherInputData)
+            self.radio2.place(x=340,y=100)  
+        else:   
+            self.path.set("")
+            Label (text="Seleccione path: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=100)
+            self.txtpath = Entry(textvariable=self.path,width=53)
+            self.txtpath.place(x=125,y=100)
+            Button (text='...',width=3,command=self.GetPath).place(x=450,y=95)
+
+    def GetPath(self):    
+        self.path.set(filedialog.askdirectory(title='Escoja path', initialdir="C:"))
+        self.OtherInputData()
+
+    def OtherInputData(self):
+        self.radio1.configure(state="disable")
+        self.radio2.configure(state="disable")
+        if self.crw.get() == '1' or self.cran.get() == '1' or self.path.get() is not None:
+            if self.mod == '1':
+                if self.cQuery.get() != '1':  #casual o experto
+                    Label (self.canvas,text="Modo de consulta: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=140) 
+                    self.radio1=Radiobutton(text="Casual",bg="blue",fg="white",font=("arial",10), variable=self.queryMode, value='1',command=self.QueryMode)
+                    self.radio1.place(x=150,y=140)
+                    self.radio2=Radiobutton(text="Experto",bg="blue",fg="white",font=("arial",10), variable=self.queryMode, value='2',command=self.QueryMode)
+                    self.radio2.place(x=240,y=140)
                 else:
-                    query = cranQuery
-                    for q in query:
-                        multResults = ExcecuteModel(content, q, queryMode, coincidence)            
-                        if(type(query) == list):
-                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
-                        else:
-                            print(f'\nRESULTADOS DE LA CONSULTA: {q}\n')
-                        if(len(multResults) == 0):
-                            print('NO SE ENCONTRARON COINCIDENCIAS')
-                        for i in multResults:
-                            if(i[1] != 0):
-                                print(f'Articulo: {i}  \n') 
-                
-            elif(mod == '2'):
-                multResults = []
-                if(cQuery == '2'):
-                    print('INGRESE LA CONSULTA DESEADA')
-                    query = input()
-                    multResults, _ = ExcecuteModelV(content, [query])
-                    print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                    for i in multResults:
-                        if(len(i) == 0):
-                            print('NO SE ENCONTRARON COINCIDENCIAS')
-                        else:
-                            if(i[1] != 0):
-                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
-                else:                   
-                    multResults, dq = ExcecuteModelV(content, cranQuery)
-                    p, r = Evaluate(dq, qrels)
-                    fValue = F(p, r)
-                    f1Value = F1(p, r)
-                    print(f'Precision: {p}, Recobrado: {r}, F: {fValue}, F1: {f1Value} \n')
-                    for j in range(len(multResults)):
-                        if(type(cranQuery) == list):
-                            print(f'\nRESULTADOS DE LA CONSULTA: {cranQuery[j]}\n')
-                        else:
-                            print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                        if(len(multResults[j]) == 0):
-                            print('NO SE ENCONTRARON COINCIDENCIAS')
-                        for i in multResults[j]:
-                            if(i[1] != 0):
-                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n') 
-                        #if(type(query) == list):
-                        #    print(f'\nRESULTADOS DE LA CONSULTA: {query[q]}\n')
-                        #else:
-                        #    print(f'\nRESULTADOS DE LA CONSULTA: {query[q]}\n')
-                        #if(len(multResults) == 0):
-                        #    print('NO SE ENCONTRARON COINCIDENCIAS')
-                        #for i in multResults:
-                        #    if(i[1] != 0):
-                        #        print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n') 
-                    
-            
-            elif(mod == '3'):
-                multResults = []
-                print('TECLEE VALOR DE K')
-                k = input()
+                    self.QueryMode()
 
-                if(cQuery == '2'):
-                    print('INGRESE LA CONSULTA DESEADA')
-                    query = input()
-                    multResults, _ = ExcecuteModelL(content, [query], int(k))
-                    print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                    for i in multResults:
-                        if(type(i) == list):
-                            for j in i:
-                                if(j[1] != 0):
-                                    print(f'Relevancia: {j[1]} --- Articulo: {j[0]}  \n')
-                        if(len(i) == 0):
-                            print(f'NO SE ENCONTRARON COINCIDENCIAS\n')
-                        if(len(i) > 0 and i[1] != 0):
-                            print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')
-                else:          
-                    query = cranQuery         
-                    multResults, dq = ExcecuteModelL(content, query, int(k)) 
-                    p, r = Evaluate(dq, qrels)
-                    fValue = F(p, r)
-                    f1Value = F1(p, r)
-                    print(f'Precision: {p}, Recobrado: {r}, F: {fValue}, F1: {f1Value} \n')
-                    for j in range(len(multResults)):
-                        if(type(cranQuery) == list):
-                            print(f'\nRESULTADOS DE LA CONSULTA: {query[j]}\n')
-                        else:
-                            print(f'\nRESULTADOS DE LA CONSULTA: {query}\n')
-                        if(len(multResults[j]) == 0):
-                            print('NO SE ENCONTRARON COINCIDENCIAS')
-                        for i in multResults[j]:
-                            if(i[1] != 0):
-                                print(f'Relevancia: {i[1]} --- Articulo: {i[0]}  \n')           
-                
-            flag = False
-        
-        if(flag):
-            print('El path es invalido')
-        print('TECLEE: ')
-        print('1 - Salir')
-        print('2 - Hacer otra consulta')
-        fin = input()
+            elif self.mod == '2':
+                if(self.cQuery.get() == '2'):
+                    Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=160)
+                    self.query = Text(width=58,height=3) 
+                    self.query.place(x=20,y=180)  
+                self.ExcecuteButton()
+            elif self.mod == '3':
+
+                Label(text="Teclee valor de K: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=140)
+                Entry(textvariable=self.k,width=10).place(x=200,y=140)
+                if(self.cQuery.get() == '2'):
+                    Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=200)
+                    self.query = Text(width=58,height=3) 
+                    self.query.place(x=20,y=220)  
+                self.ExcecuteButton()
+                #self.button = Button (text='Ejecutar',font=("arial",10),command=self.ejecutar)
+                #self.button.place(x=200,y=420)       
+                      
+    def QueryMode(self):
+        self.radio1.configure(state="disable")
+        self.radio2.configure(state="disable") 
     
+        if self.queryMode.get() == '1':
+            Label (text="Tipo de coincidencia: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=180)                
+            self.radio1=Radiobutton(text="Total",bg="blue",fg="white",font=("arial",10), variable=self.coincidence, value='1',command=self.Coincidence)
+            self.radio1.place(x=150,y=180)
+            self.radio2=Radiobutton(text="Parcial",bg="blue",fg="white",font=("arial",10), variable=self.coincidence, value='2',command=self.Coincidence)
+            self.radio2.place(x=240,y=180)
+        self.TypeQuery()
+    
+    def Coincidence(self):
+        self.radio1.configure(state="disable")
+        self.radio2.configure(state="disable") 
+        #self.TypeQuery()    
+        
+    def TypeQuery(self):
+        if  self.cQuery.get() == '2':
+            Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=220)
+            self.query = Text(width=58,height=3) 
+            self.query.place(x=20,y=240)
+        self.ExcecuteButton()   
+
+    def boolModel(self):
+        self.mod='1'
+        self.modelName="MODELO BOOLEANO";
+        self.InputData()
+
+    def vecModel(self):
+        self.mod='2' 
+        self.modelName="MODELO VECTORIAL";
+        self.InputData()
+
+    def lsaModel(self):
+        self.mod='3'
+        self.modelName="MODELO SEMÁNTICA LATENTE";
+        self.InputData()
+
+    def ExcecuteButton(self):
+        if self.mod!='1':
+            Label(text="Teclee valor del umbral: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=280)
+            Entry(textvariable=self.umbralS,width=10).place(x=200,y=280)  
+        Button(text='Ejecutar',font=("arial",10),command=self.Excecute).place(x=200,y=320)
+        
+
+    def Excecute(self):
+        Label(text="Espere ...",bg="blue",fg="white",font=("arial",10)).place(x=200,y=320)
+        #u=self.umbralS.get()
+        #self.umbral=float(u)
+        self.umbral=self.umbralS.get()
+        
+        result,p,r,f1value,cranQuery =CallModel(self)
+        if(len(result[0]) == 0):
+            Label(text="NO SE ENCONTRARON COINCIDENCIAS",bg="blue",fg="white",font=("arial",12)).place(x=100,y=320)
+            Label(self.root,text="BÚSQUEDA FINALIZADA",bg="blue",fg="white",font=("arial",12)).place(x=150,y=370)        
+            Button(self.root,text='Reiniciar',font=("arial",10),command=self.InputData).place(x=200,y=420)
+        else:
+            if p!=None:
+                l=Label(self.root,text=f'Precisión: {p}\nRecobrado: {r} \nF1: {f1value}',bg="blue",fg="white",font=("arial",10))
+                l.place(x=140,y=320)
+            self.ShowResult(result,cranQuery)
+            
+    def ShowResult(self,result,cranQuery):
+        global crw
+        global cran
+        self.vr = Toplevel(self.root)
+        self.vr.title("Resultado del " + self.modelName) 
+        self.vr.geometry("610x500"+"+"+str(540)+"+"+str(10)) 
+        self.vr.resizable(0,0)
+        self.vr.config(bg="blue", bd=12, relief="sunken")
+      
+        hscrollbar = Scrollbar(self.vr, orient=HORIZONTAL)
+        vscrollbar = Scrollbar(self.vr, orient=VERTICAL)
+
+        resultList=  Listbox(self.vr, height=27, width=81, bg="black",fg="white",font=("arial",10),
+                                 xscrollcommand=hscrollbar.set, yscrollcommand=vscrollbar.set)
+        
+        hscrollbar.config(command=resultList.xview)
+        hscrollbar.pack(side=BOTTOM, fill=X)
+        vscrollbar.config(command=resultList.yview)
+        vscrollbar.pack(side=RIGHT, fill=Y)
+              
+        resultList.place(x=0,y=0)        
+        resultList.config(xscrollcommand=hscrollbar.set, yscrollcommand=vscrollbar.set)
+              
+        if self.mod=='1': #booleano
+            if self.cQuery.get()=='2':
+                resultList.insert(END ,'')
+                resultList.insert(END ,f'CONSULTA: {self.query.get(1.0,"end-1c")}')
+                for i in result:
+                    for j in i:
+                        if len(j)==0:
+                            resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
+                        else:
+                            if j[1] != 0:
+                                resultList.insert(END ,"Artículo: " + j)
+            else:
+                for j in range(len(result)):
+                    resultList.insert(END ,'')
+                    if(type(cranQuery) == list):
+                        resultList.insert(END ,f'CONSULTA: {cranQuery[j]}')
+                    else:
+                        resultList.insert(END ,f'CONSULTA: {self.query.get(1.0,"end-1c")}')  
+                    if  len(result[j])==0:
+                        resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
+                    else: #OJOOOO el ese lo puse yo preguntar
+                        for i in result[j]:
+                            if i[1] != 0:
+                                resultList.insert(END ,"Artículo: " + i)
+                        
+        elif self.mod=='2':
+            if self.cQuery.get()=='2':
+                resultList.insert(END ,'')
+                resultList.insert(END ,f'CONSULTA: {self.query.get(1.0,"end-1c")}')  
+                for i in result:
+                    for j in i:
+                        if len(j)==0:
+                            resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
+                        else:  
+                            if j[1] != 0:               
+                                resultList.insert(END , f'Relevancia: {j[1]} --- Artículo: {j[0]}' )
+            else:
+                for j in range(len(result)):
+                    resultList.insert(END ,'')
+                    if(type(cranQuery) == list):
+                        resultList.insert(END ,f'CONSULTA: {cranQuery[j]}')
+                    else:
+                        resultList.insert(END ,f'CONSULTA: {self.query.get(1.0,"end-1c")}')
+                    if(len(result[j]) == 0):
+                        resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
+                    for i in result[j]:
+                        if(i[1] != 0):
+                            resultList.insert(END ,f'Relevancia: {i[1]} --- Artículo: {i[0]}') 
+        elif self.mod=='3':
+            if self.cQuery.get()=='2':
+                resultList.insert(END ,'')
+                resultList.insert(END ,f'CONSULTA: {self.query.get(1.0,"end-1c")}')  
+                for i in result:
+                    if type(i) == list:
+                        for j in i:
+                            if len(j)==0:
+                                resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
+                            else:
+                                if j[1]!=0:
+                                    resultList.insert(END ,f'Relevancia: {j[1]} --- Artículo: {j[0]}') 
+            else:
+                for j in range(len(result)):
+                    resultList.insert(END ,'')
+                    if type(cranQuery)==list:
+                        resultList.insert(END ,f'CONSULTA: {cranQuery[j]}')  
+                    else:
+                        resultList.insert(END ,f'CONSULTA: {cranQuery}') 
+                    if(len(result[j]) == 0):
+                        resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
+                    else:
+                        for i in result[j]:
+                            if(i[1] != 0):
+                                resultList.insert(END ,f'Relevancia: {i[1]} --- Artículo: {i[0]}') 
+        if self.cQuery.get()=='1':
+            pass
+        else:
+            Label(text="                        ",bg="blue",height=5).place(x=200,y=320)                                
+        Label(self.root,text="BÚSQUEDA FINALIZADA",bg="blue",fg="white",font=("arial",12)).place(x=150,y=370)        
+        Button(self.root,text='Reiniciar',font=("arial",10),command=self.InputData).place(x=200,y=420)        
+
+        crw = self.crw.get()
+        cran = self.cran.get() if self.cran is not None else '0'
+        
+        selectedResult = 'Ningún elemento Seleccionado'
+        resultList.bind('<<ListboxSelect>>', Select)
+        self.vr.bind('<Return>', lambda ev:showinfo(title='text Seleccionado', message=selectedResult))
+
+        self.vr.mainloop()
+
+def Select(ev):
+    global selectedResult
+    global cran
+    global crw
+    selectedResult = ev.widget.get(ANCHOR)
+    if(cran != '1'):
+        if crw =='1':
+            selectedResult = selectedResult[selectedResult.find('http'):len(selectedResult)]  
+        else:
+            selectedResult = selectedResult[selectedResult.find('Artículo: ')+10:len(selectedResult)]
+    
+        texto = ReadSimple(selectedResult)   
+        if texto != None:
+            Content(selectedResult,texto)
+    
+
+selectedResult = None    
+crw = None
+cran = None    
+
 if __name__ == '__main__':
-    main()
+    app=View()
