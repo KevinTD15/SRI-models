@@ -74,7 +74,7 @@ def TFxIDFQuery(qtf, idf):
     return result
 
    
-def SimFunc(docs, query, content, index):
+def SimFunc(docs, query, content, index, umbral):
     '''Funcion de similitud donde se multiplica cada wij con los wiq'''
     result = []
     dq = []
@@ -84,15 +84,14 @@ def SimFunc(docs, query, content, index):
         eucDistQ = np.linalg.norm(query)
         eucDistD = np.linalg.norm(i)
         relevance = dotProd / (eucDistQ * eucDistD)
-        # and count >= 0.1 poner esto en el if para sesgar las relevancias
-        if([content[docAct][0], relevance] not in result and relevance >= 0.4):
+        if([content[docAct][0], relevance] not in result and relevance >= umbral):
             result.append([content[docAct][0], relevance])
             dq.append((docAct + 1, index + 1))
         docAct += 1
     result.sort(key=lambda x : x[1], reverse=True)
     return result, dq
 
-def ExcecuteModelV(content, query):
+def ExcecuteModelV(content, query, umbral):
     '''inicio de la ejecucion del modelo'''  
 
     normalizedContent = CleanAllTokens(content)
@@ -106,7 +105,7 @@ def ExcecuteModelV(content, query):
         qft = FreqTableQuery(normalizeQuery, term)
         normalizedQft = NormalizeFTQuery(qft)
         wiq = TFxIDFQuery(normalizedQft, idf)        
-        docs, dq = SimFunc(wij, wiq, content, q)
+        docs, dq = SimFunc(wij, wiq, content, q, umbral)
         docsRes.append(docs)
         dqRes.append(dq)
     return docsRes, dqRes
