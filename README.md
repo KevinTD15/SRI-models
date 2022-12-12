@@ -15,6 +15,12 @@ Manual de usuario:
 
 --La ejecución se inicia al es escribir: python main.py en la consola
 
+Nota:
+Para usar el Crawling es necesaio estar conectado a internet.
+OJO: Si el firewall está activado hay que darle conección a:
+ -vscode
+ -navegador(chrome, firefox, opera, etc)
+
 1- Modelos: Booleano, Vectorial, LSA.
 
 2- Desea Crawlear: (Si ó no).
