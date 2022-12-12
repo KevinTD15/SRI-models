@@ -1,5 +1,6 @@
+from collections import Counter
+from math import log10
 from Utilities.tokenizer import *
-from Models.vecModel import *
 import numpy as np
 
 def GetVectors(S):
@@ -47,6 +48,74 @@ def ToMatrix(Sr):
 
 def Acomodar(VT, shape):
     return VT[0:shape[0], 0:shape[1]]
+
+def FreqTable(normalizedContent):
+    '''Se crea la tabla de frecuencia'''
+    terms = set()
+
+    normalizedContent = list([list(x) for x in normalizedContent])
+    
+    for i in normalizedContent:
+        terms.update(i)
+        
+    term = list(terms)    
+
+    idf = np.zeros(len(term), float)
+    occurrence = np.zeros(len(term), int)
+    tf = np.zeros((len(normalizedContent), len(term)), float)
+    tfidf = np.zeros((len(normalizedContent), len(term)), float)
+    setList = []
+    
+    for i in normalizedContent:
+        setList.append(set(i))
+    
+    for i in range(len(term)):
+        for j in setList:
+            if(term[i] in j):
+                occurrence[i] += 1
+                idf[i] = log10(len(normalizedContent)/occurrence[i])
+        
+    for j in range(len(normalizedContent)):
+        mark = set()
+        if(len(normalizedContent[j]) > 0):
+            maxV = Counter(normalizedContent[j]).most_common()[0][1]
+            for k in normalizedContent[j]:
+                if(k not in mark):
+                    ind = term.index(k)                    
+                    tf[j][ind] = normalizedContent[j].count(k) / maxV
+                    tfidf[j][ind] = idf[ind] * tf[j][ind]
+                    mark.add(k)               
+    return tfidf, terms, idf
+
+def NormalizeFTQuery(qft):
+    '''Normaliza los terminos de la query'''
+    maxV = max(qft)
+    return (list(map(lambda x: x / maxV, qft)))
+
+def TFxIDFQuery(qtf, idf):
+    '''Se calcula la relevancia final'''
+    result = []
+    for i in range(len(qtf)):
+        result.append(qtf[i] * idf[i])
+    return result
+
+def FreqTableQuery(normalizedQuery, terms):
+    '''Tabla de frecuencia de los terminos de la query respecto a los del corpus'''
+    cq = np.zeros(len(terms), int)
+    flag = False
+    mark = set()
+    term = list(terms)
+    
+    for i in normalizedQuery:
+        flag = True
+        if(i not in mark and i in terms):
+            ind = term.index(i)    
+            cq[ind] = normalizedQuery.count(i)
+            mark.add(i)
+    
+    if(not flag):
+        return 0
+    return cq
 
 def SimFunc(docVec, queryVec, content, q, umbral):
     result = []
