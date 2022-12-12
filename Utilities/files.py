@@ -1,6 +1,16 @@
 from docx import Document
 from PyPDF2 import PdfFileReader
 import os, glob
+import webbrowser
+
+def readSimple(path):
+    '''Funcion que recibe un path y devuelve solo su contenido (solo txt y doc(x))'''
+    #if os.path.isfile(path):
+    if path.endswith('.txt'):   return ReadTXT(path)
+    elif path.endswith('.doc') or path.endswith('.docx'):   return ReadDOCX(path)
+    else:
+        webbrowser.open_new_tab(path)
+    return None
 
 def ReadTXT(path):
     '''Funcion que recibe un .txt y devuelve su contenido'''
