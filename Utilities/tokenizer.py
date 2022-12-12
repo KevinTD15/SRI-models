@@ -34,7 +34,7 @@ def CleanToken(text, flag = False):
     stop = set(stopwords.words('english'))
     for i in tokenize:
         i = lemmatizer.lemmatize(i)
-        if not i.lower() in stop:
+        if not i.lower() in stop and "'" not in i:
             if (len(i) > 1):
                 cleanToken.append(i.lower())
     return cleanToken
