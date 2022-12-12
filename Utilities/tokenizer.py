@@ -32,6 +32,8 @@ def CleanToken(text, flag = False):
     cleanToken = []
     lemmatizer  = WordNetLemmatizer()
     stop = set(stopwords.words('english'))
+    stop1 = set(stopwords.words('spanish'))
+    stop = stop.union(stop1)
     for i in tokenize:
         i = lemmatizer.lemmatize(i)
         if not i.lower() in stop and "'" not in i:
