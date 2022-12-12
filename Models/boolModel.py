@@ -67,17 +67,20 @@ def DocXTerm(normalizedContent):
         terms.update(i)
     term = list(terms)
     
-    cq = np.zeros((len(normalizedContent), len(term)), int)
+    matrix = [{} for x in range(len(normalizedContent))]
+    
+    #cq = np.zeros((len(normalizedContent), len(term)), int)
     
     for i in range(len(normalizedContent)):
         mark = set()
         for j in normalizedContent[i]:
             if(j not in mark):
                 ind = term.index(j)
-                cq[i][ind] = 1
+                matrix[i][ind] = 1
+                #cq[i][ind] = 1
                 mark.add(j)
       
-    return cq, term
+    return matrix, term
 
 def CreateExpresionList(queryFnd):
     '''Funcion que defuelve una lisa en la que en cada elemento hay una expresion de la FND'''
@@ -99,20 +102,37 @@ def SimFunc(docXTerm, exprList, content, q):
     count = -1   
     for d in docXTerm[0]:
         count += 1
-        for expr in exprList:
-            flag = True
-            for e in expr:
-                if(e.name in docXTerm[1]):
-                    ind = docXTerm[1].index(e.name)
-                    if(d[ind] != expr[e]):
-                        flag = False  
-                        break
-                else:
-                    flag = False
-            if(flag):
-                if(content[count][0] not in docs):
-                    docs.append(content[count][0]) 
-                    dq.append((count + 1, q + 1))
+        if(len(exprList) == 1):
+            for expr in exprList:
+                flag = True
+                for e in expr:
+                    if(e.name in docXTerm[1]):
+                        ind = docXTerm[1].index(e.name)
+                        if((expr[e] == 1 and ind not in d) or (expr[e] == 0 and ind in d)):
+                            flag = False  
+                            break
+                    else:
+                        flag = False
+                #if(flag):
+                if(flag == True):
+                    if(content[count][0] not in docs):
+                        docs.append(content[count][0]) 
+                        dq.append((count + 1, q + 1))
+        else:
+            flag = False
+            for expr in exprList:
+                for e in expr:
+                    if(e.name in docXTerm[1]):
+                        ind = docXTerm[1].index(e.name)
+                        if((expr[e] == 1 and ind in d) or (expr[e] == 0 and ind not in d)):
+                            if(content[count][0] not in docs):
+                                docs.append(content[count][0]) 
+                                dq.append((count + 1, q + 1))
+                                flag = True
+                                break
+                if(flag):
+                    break
+                    
     return docs, dq
         
 def ExcecuteModel(content, query, queryMode, coincidence):
