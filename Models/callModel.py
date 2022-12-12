@@ -38,10 +38,8 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
 
                 else:
                     query = cranQuery
-                    #for q in query:
                     multResults, dq = ExcecuteModel(content, query, app.queryMode.get(), app.coincidence.get())            
                     p, r = Evaluate(dq, qrels)
-                    fValue = F(p, r)
                     f1Value = F1(p, r)
                     return multResults,p,r,f1Value,cranQuery
                 
@@ -53,7 +51,6 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
                 else: 
                     multResults, dq = ExcecuteModelV(content,cranQuery,app.umbral)
                     p, r = Evaluate(dq, qrels)
-                    fValue = F(p, r)
                     f1Value = F1(p, r)
                     return multResults,p,r,f1Value,cranQuery
             
@@ -68,7 +65,6 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
                     query = cranQuery         
                     multResults, dq = ExcecuteModelL(content, query, app.k.get(),app.umbral) 
                     p, r = Evaluate(dq, qrels)
-                    fValue = F(p, r)
                     f1Value = F1(p, r)
                     return multResults,p,r, f1Value, cranQuery
        
