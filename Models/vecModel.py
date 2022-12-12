@@ -55,7 +55,7 @@ def FreqTable(normalizedContent):
         if(len(normalizedContent[j]) > 0):
             maxV = Counter(normalizedContent[j]).most_common()[0][1]
             for k in normalizedContent[j]:
-                if(k not in mark):                   
+                if(k not in mark and k in terms):                   
                     ind = term.index(k)                    
                     tf[j][ind] = normalizedContent[j].count(k) / maxV
                     val = idf[ind] * tf[j][ind]
