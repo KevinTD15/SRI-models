@@ -187,14 +187,13 @@ class View():
         self.umbral=self.umbralS.get()
         
         result,p,r,f1value,cranQuery =CallModel(self)
-        if(len(result[0]) == 0):
-            Label(text="NO SE ENCONTRARON COINCIDENCIAS",bg="blue",fg="white",font=("arial",12)).place(x=100,y=320)
-            Label(self.root,text="BÚSQUEDA FINALIZADA",bg="blue",fg="white",font=("arial",12)).place(x=150,y=370)        
-            Button(self.root,text='Reiniciar',font=("arial",10),command=self.InputData).place(x=200,y=420)
-        else:
-            if p!=None:
-                l=Label(self.root,text=f'Precisión: {p}\nRecobrado: {r} \nF1: {f1value}',bg="blue",fg="white",font=("arial",10))
-                l.place(x=140,y=320)
+        #if(len(result[0]) == 0):
+        #Label(text="NO SE ENCONTRARON COINCIDENCIAS",bg="blue",fg="white",font=("arial",12)).place(x=100,y=320)
+        Label(self.root,text="BÚSQUEDA FINALIZADA",bg="blue",fg="white",font=("arial",12)).place(x=150,y=370)        
+        Button(self.root,text='Reiniciar',font=("arial",10),command=self.InputData).place(x=200,y=420)
+        if p!=None:
+            l=Label(self.root,text=f'Precisión: {p}\nRecobrado: {r} \nF1: {f1value}',bg="blue",fg="white",font=("arial",10))
+            l.place(x=140,y=320)
             self.ShowResult(result,cranQuery)
             
     def ShowResult(self,result,cranQuery):
