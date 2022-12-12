@@ -4,8 +4,41 @@ from sympy import And, Symbol
 from sympy.logic.inference import satisfiable
 from sympy.logic.boolalg import to_dnf
 from functools import lru_cache
+from typing import Dict as tDict, Any, Optional
+import builtins
+import types
 
 reserved = ["|", "&", "~", "(", ")"]
+DICT = tDict[str, Any]
+keywordsSympy = {}
+
+def loadKeywords(keywordsSympy: Optional[DICT] = None):
+    exec('from sympy import *', keywordsSympy)
+    builtins_dict = vars(builtins)
+    for name, obj in builtins_dict.items():
+        if isinstance(obj, types.BuiltinFunctionType):
+            keywordsSympy[name] = obj
+
+def eliminaKeywords(cadena, keywords):
+    cadenaSinKeywords=""   
+    band=False
+    otrasKeys = ['else','round','input', 'Integer' ]
+    
+    if len(cadena)>0:
+        for i in cadena.split(' '):
+            if band: 
+                band=False
+                continue
+            if  i in keywords or i in otrasKeys or (i[0]>='0' and i[0]<='9'):
+                band=True
+            else:
+                if cadenaSinKeywords=="": 
+                    cadenaSinKeywords=i
+                else: 
+                    cadenaSinKeywords=cadenaSinKeywords+' '+i
+        if(band):
+            cadenaSinKeywords = cadenaSinKeywords[0:len(cadenaSinKeywords) - 2]         
+    return cadenaSinKeywords
 
 def ToSymbol(normalizedQuery):
     '''Funcion donde cada palabra de la consulta e convierte en un simbolo'''
@@ -59,9 +92,10 @@ def CreateExpresionList(queryFnd):
         exprList.append(expr)
     return exprList
 
-def SimFunc(docXTerm, exprList, content):
+def SimFunc(docXTerm, exprList, content, q):
     '''Funcion de similitud del modelo booleano'''
     docs = []
+    dq = []
     count = -1   
     for d in docXTerm[0]:
         count += 1
@@ -77,28 +111,36 @@ def SimFunc(docXTerm, exprList, content):
                     flag = False
             if(flag):
                 if(content[count][0] not in docs):
-                    docs.append(content[count][0])   
-    return docs
+                    docs.append(content[count][0]) 
+                    dq.append((count + 1, q + 1))
+    return docs, dq
         
 def ExcecuteModel(content, query, queryMode, coincidence):
     '''Funcion principal de la ejecucion del modelo'''
     normalizedContent = CleanAllTokens(content)
-    if(queryMode == '2'):
-        normalizedQuery = NormalizeQuery(query)
-    elif(queryMode == '1'):
-        cleanedQuery = CleanToken(query, True)
-        normalizedQuery = ToAndForm(cleanedQuery)
     normalizedContent = tuple([tuple(x) for x in normalizedContent])
     docXTerm = DocXTerm(normalizedContent)
-    ToSymbol(normalizedQuery)
-    queryFnd = to_dnf(normalizedQuery)
-    if((type(queryFnd) is And) and coincidence == '2'):
-        exprList = CreateExpresionList(queryFnd)
-    elif(type(queryFnd) is And) or (hasattr(queryFnd, 'name') and queryFnd.name != None):
-        exprList = [satisfiable(queryFnd)]
-    else:
-        exprList = CreateExpresionList(queryFnd)
-    docs = SimFunc(docXTerm, exprList, content)
-    return docs
+    loadKeywords(keywordsSympy)
+    docs = []
+    dq = []
+    for q in range(len(query)):
+        if(queryMode == '2'):
+            normalizedQuery = NormalizeQuery(query[q])
+        elif(queryMode == '1'):
+            cleanedQuery = CleanToken(query[q], True)
+            normalizedQuery = ToAndForm(cleanedQuery)
+        normalizedQuery=eliminaKeywords(normalizedQuery,keywordsSympy)
+        ToSymbol(normalizedQuery)
+        queryFnd = to_dnf(normalizedQuery)
+        if((type(queryFnd) is And) and coincidence == '2'):
+            exprList = CreateExpresionList(queryFnd)
+        elif(type(queryFnd) is And) or (hasattr(queryFnd, 'name') and queryFnd.name != None):
+            exprList = [satisfiable(queryFnd)]
+        else:
+            exprList = CreateExpresionList(queryFnd)
+        doc, dqpos = SimFunc(docXTerm, exprList, content, q)
+        docs.append(doc)
+        dq.append(dqpos)
+    return docs, dq
     
     
