@@ -12,30 +12,36 @@ class View():
         self.root.title("Modelos de SRI")
         self.root.geometry("520x480"+"+"+str(10)+"+"+str(10)) 
         self.root.resizable(1,1)
-        self.root.config(bg="blue",relief="sunken",bd=12) 
+        self.root.config(bg="lightblue",relief="sunken",bd=12) 
         self.menuBar = Menu(self.root)
         self.root.config(menu=self.menuBar)
         self.InitializeMenu()
 
-        Label(text="Proyecto Final de SRI  2022\n\nIntegrante:\n Kevin Talavera Díaz C-311",bg="blue",fg="white",font=("arial",14),border=10,justify=CENTER).place(x=220,y=350)
+        Label(text="Proyecto Final de SRI  2022\n\nIntegrante:\n Kevin Talavera Díaz C-311",bg="lightblue",fg="black",font=("arial",14),border=10,justify=CENTER).place(x=220,y=350)
         self.vr = None
         self.canvas = None
         self.mod = None
         self.path = StringVar()
-        self.queryMode = StringVar(value='1') 
+        self.queryMode = StringVar(value='0') 
         self.crw = None
         self.time = None
         self.cran = None
         self.radio1 = None
         self.radio2 = None
+        self.radio3 = None
+        self.radio4 = None
+        self.radio5 = None
         self.query = None
         self.k = IntVar(value=150)
         self.umbralS = DoubleVar(value=0.5)
         self.umbral = None
         self.cQuery = None
+        self.cisi = None
         self.modelName = None
         self.coincidence = StringVar(value='0') 
         self.button = None 
+        self.consult =None
+        self.lcoincidence = None
         
         self.root.mainloop() 
 
@@ -46,114 +52,127 @@ class View():
         self.menuBar.add_cascade(label="Salir", command=self.root.quit)
 
     def CreateCanvas(self):
-        self.canvas= Canvas(self.root,bd=0,highlightthickness=0,bg="blue", relief="sunken",width=520,height=480)
+        self.canvas= Canvas(self.root,bd=0,bg="lightblue", relief="sunken",width=520,height=480)
         self.canvas.pack(side=LEFT, fill=BOTH, expand=TRUE)
         self.canvas.xview_moveto(0)
         self.canvas.yview_moveto(0)
-        Label (text=self.modelName,bg="blue",fg="black",font=("arial",10)).place(x=150,y=2)
+        Label (text=self.modelName,bg="lightblue",fg="black",font=("arial",10)).place(x=150,y=20)
 
     def InputData(self):
         if self.canvas != None:
             self.canvas.destroy()
         self.CreateCanvas()  
 
-        self.cQuery = StringVar(value='2') 
-        Label (text="Desea Crawlear",bg="blue",fg="white",font=("arial",10)).place(x=20,y=20)
-        self.crw=StringVar(value='2') 
-        self.radio1=Radiobutton(text="sí",bg="blue",fg="white",font=("arial",10), variable=self.crw, value=1,command=self.ReadCrawling)
-        self.radio1.place(x=150,y=20)
-        self.radio2=Radiobutton(text="no",bg="blue",fg="white",font=("arial",10), variable=self.crw, value=2,command=self.ReadCrawling)
-        self.radio2.place(x=190,y=20)
+        self.cQuery=StringVar(value="2")
+        self.crw=StringVar()
+        self.cran=StringVar()
+        self.cisi=StringVar()
+        self.consult=StringVar(value="0")
+
+        self.radio1=Radiobutton(text="Crawling",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='1',command=self.ReadCrawling)
+        self.radio1.place(x=20,y=50)
+        self.radio2=Radiobutton(text="Cranfield",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='2',command=self.ReadDataset)
+        self.radio2.place(x=120,y=50)
+        self.radio3=Radiobutton(text="CISI",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='3',command=self.ReadDataset)
+        self.radio3.place(x=220,y=50)
+        self.radio4=Radiobutton(text="otro",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='4',command=self.ReadCrawling)
+        self.radio4.place(x=300,y=50)
+        self.radio5=Radiobutton(text="None",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='5',command=self.SelectPath)
+        self.radio5.place(x=380,y=50)
+
+    def disableButton(self,radio345=False):
+        self.radio1.configure(state="disable")
+        self.radio2.configure(state="disable")
+        if radio345:
+            self.radio3.configure(state="disable")
+            self.radio4.configure(state="disable")
+            self.radio5.configure(state="disable")
 
     def ReadCrawling(self):
-        self.radio1.configure(state="disable")
-        self.radio2.configure(state="disable")
-        if self.crw.get()=='1': 
-            self.time=IntVar()
-            Label(text="Teclee tiempo limite (segundos) para el proceso",bg="blue",fg="white",font=("arial",10)).place(x=20,y=60)
-            Entry(width=3,textvariable=self.time).place(x=310,y=60)
-            self.button = Button (text='ok',font=("arial",10),command=self.OtherInputData)
-            self.button.place(x=350,y=60)
-        else:
-            Label(text="Desea usar la base de datos de CRANFIELD",bg="blue",fg="white",font=("arial",10)).place(x=20,y=60)
-            self.cran = StringVar(value='2')
-            self.radio1=Radiobutton(text="sí",bg="blue",fg="white",font=("arial",10), variable=self.cran, value='1',command=self.ReadCranfield)
-            self.radio1.place(x=300,y=60)
-            self.radio2=Radiobutton(text="no",bg="blue",fg="white",font=("arial",10), variable=self.cran, value='2',command=self.ReadCranfield)
-            self.radio2.place(x=340,y=60)      
+        self.disableButton(True)
+        self.crw=StringVar(value='1')
+        self.time=IntVar()
+        Label(text="Teclee tiempo limite (segundos) para el proceso",bg="lightblue",fg="black",font=("arial",10)).place(x=20,y=100)
+        Entry(width=3,textvariable=self.time).place(x=310,y=100)
+        self.button = Button (text='ok',font=("arial",10),command=self.OtherInputData)
+        self.button.place(x=350,y=60)
+     
 
-    def ReadCranfield(self):
-        self.radio1.configure(state="disable")
-        self.radio2.configure(state="disable")
-        if self.cran.get()=='1':  
-            Label(text="Desea usar consultas de CRANFIELD ?:",bg="blue",fg="white",font=("arial",10)).place(x=20,y=100)
-            self.radio1=Radiobutton(text="sí",bg="blue",fg="white",font=("arial",10), variable=self.cQuery, value='1', command=self.OtherInputData)
-            self.radio1.place(x=300,y=100)
-            self.radio2=Radiobutton(text="no",bg="blue",fg="white",font=("arial",10), variable=self.cQuery, value='2', command=self.OtherInputData)
-            self.radio2.place(x=340,y=100)  
-        else:   
+    def ReadDataset(self):
+        self.disableButton(True)
+        if(self.consult.get() == '3'):
+            self.cisi=StringVar(value='1')
+        else:
+            self.cran=StringVar(value='1')
+        Label(text="Desea usar sus consultas ?:",bg="lightblue",fg="black",font=("arial",10)).place(x=20,y=100)
+        self.radio1=Radiobutton(text="sí",bg="lightblue",fg="black",font=("arial",10), variable=self.cQuery, value='1', command=self.OtherInputData)
+        self.radio1.place(x=300,y=100)
+        self.radio2=Radiobutton(text="no",bg="lightblue",fg="black",font=("arial",10), variable=self.cQuery, value='2', command=self.OtherInputData)
+        self.radio2.place(x=340,y=100)  
+
+    def SelectPath(self):
+            self.disableButton(True)  
+            self.cQuery=StringVar(value='2')
             self.path.set("")
-            Label (text="Seleccione path: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=100)
+            Label (text="Seleccione path: ",font=("arial",10),bg="lightblue",fg="black").place(x=20,y=100)
             self.txtpath = Entry(textvariable=self.path,width=53)
             self.txtpath.place(x=125,y=100)
-            Button (text='...',width=3,command=self.GetPath).place(x=450,y=95)
+            Button (text='...',width=3,command=self.GetPath).place(x=448,y=95)
+            self.OtherInputData()
 
     def GetPath(self):    
         self.path.set(filedialog.askdirectory(title='Escoja path', initialdir="C:"))
-        self.OtherInputData()
+        #self.OtherInputData()
+
+    def ReadCISI(self):
+        self.disableButton(True)
+        self.cisi=StringVar(value='1')
+        pass
 
     def OtherInputData(self):
-        self.radio1.configure(state="disable")
-        self.radio2.configure(state="disable")
-        if self.crw.get() == '1' or self.cran.get() == '1' or self.path.get() is not None:
+        self.disableButton()
+        if self.cisi.get() == '1'  or self.crw.get() == '1' or self.cran.get() == '1' or self.path.get() is not None:
             if self.mod == '1':
-                if self.cQuery.get() != '1':  #casual o experto
-                    Label (self.canvas,text="Modo de consulta: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=140) 
-                    self.radio1=Radiobutton(text="Casual",bg="blue",fg="white",font=("arial",10), variable=self.queryMode, value='1',command=self.QueryMode)
+                if self.cQuery.get() != '1': 
+                    Label (self.canvas,text="Modo de consulta: ",bg="lightblue",fg="black",font=("arial",10)).place(x=20,y=140) 
+                    self.radio1=Radiobutton(text="Casual",bg="lightblue",fg="black",font=("arial",10), variable=self.queryMode, value='1',command=self.QueryMode )
                     self.radio1.place(x=150,y=140)
-                    self.radio2=Radiobutton(text="Experto",bg="blue",fg="white",font=("arial",10), variable=self.queryMode, value='2',command=self.QueryMode)
+                    self.radio2=Radiobutton(text="Experto",bg="lightblue",fg="black",font=("arial",10), variable=self.queryMode, value='2', command=self.QueryMode )
                     self.radio2.place(x=240,y=140)
                 else:
                     self.QueryMode()
-
+                self.TypeQuery()
             elif self.mod == '2':
-                if(self.cQuery.get() == '2'):
-                    Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=160)
-                    self.query = Text(width=58,height=3) 
-                    self.query.place(x=20,y=180)  
-                self.ExcecuteButton()
+                self.TypeQuery()
             elif self.mod == '3':
-
-                Label(text="Teclee valor de K: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=140)
+                Label(text="Teclee valor de K: ",bg="lightblue",fg="black",font=("arial",10)).place(x=20,y=140)
                 Entry(textvariable=self.k,width=10).place(x=200,y=140)
-                if(self.cQuery.get() == '2'):
-                    Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=200)
-                    self.query = Text(width=58,height=3) 
-                    self.query.place(x=20,y=220)  
-                self.ExcecuteButton()
-                #self.button = Button (text='Ejecutar',font=("arial",10),command=self.ejecutar)
-                #self.button.place(x=200,y=420)       
+                self.TypeQuery()    
                       
     def QueryMode(self):
-        self.radio1.configure(state="disable")
-        self.radio2.configure(state="disable") 
-    
-        if self.queryMode.get() == '1':
-            Label (text="Tipo de coincidencia: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=180)                
-            self.radio1=Radiobutton(text="Total",bg="blue",fg="white",font=("arial",10), variable=self.coincidence, value='1',command=self.Coincidence)
+
+        if self.queryMode.get() == '1' or self.cQuery.get() == '1' :
+            self.lcoincidence= Label (text="Tipo de coincidencia: ",bg="lightblue",fg="black",font=("arial",10))
+            self.lcoincidence.place(x=20,y=180)                
+            self.radio1=Radiobutton(text="Total",bg="lightblue",fg="black",font=("arial",10), variable=self.coincidence, value='1',command=self.ExcecuteButton)
             self.radio1.place(x=150,y=180)
-            self.radio2=Radiobutton(text="Parcial",bg="blue",fg="white",font=("arial",10), variable=self.coincidence, value='2',command=self.Coincidence)
+            self.radio2=Radiobutton(text="Parcial",bg="lightblue",fg="black",font=("arial",10), variable=self.coincidence, value='2',command=self.ExcecuteButton)
             self.radio2.place(x=240,y=180)
-        self.TypeQuery()
+        elif self.lcoincidence is not None:    
+            self.lcoincidence.destroy()
+            self.radio1.destroy()
+            self.radio2.destroy()
+
+        self.ExcecuteButton()
     
-    def Coincidence(self):
+    '''def Coincidence(self):
         self.radio1.configure(state="disable")
         self.radio2.configure(state="disable") 
-        #self.TypeQuery()    
+        #self.TypeQuery()   ''' 
         
     def TypeQuery(self):
         if  self.cQuery.get() == '2':
-            Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="blue",fg="white").place(x=20,y=220)
+            Label (text="Ingrese consulta deseada: ",font=("arial",10),bg="lightblue",fg="black").place(x=20,y=220)
             self.query = Text(width=58,height=3) 
             self.query.place(x=20,y=240)
         self.ExcecuteButton()   
@@ -175,24 +194,19 @@ class View():
 
     def ExcecuteButton(self):
         if self.mod!='1':
-            Label(text="Teclee valor del umbral: ",bg="blue",fg="white",font=("arial",10)).place(x=20,y=280)
-            Entry(textvariable=self.umbralS,width=10).place(x=200,y=280)  
+            Label(text="Teclee valor del umbral: ",bg="lightblue",fg="black",font=("arial",10)).place(x=20,y=180)
+            Entry(textvariable=self.umbralS,width=10).place(x=200,y=180)  
         Button(text='Ejecutar',font=("arial",10),command=self.Excecute).place(x=200,y=320)
         
-
     def Excecute(self):
-        Label(text="Espere ...",bg="blue",fg="white",font=("arial",10)).place(x=200,y=320)
-        #u=self.umbralS.get()
-        #self.umbral=float(u)
+        Label(text="Espere ...",bg="lightblue",fg="black",font=("arial",10)).place(x=200,y=320)
         self.umbral=self.umbralS.get()
         
         result,p,r,f1value,cranQuery =CallModel(self)
-        #if(len(result[0]) == 0):
-        #Label(text="NO SE ENCONTRARON COINCIDENCIAS",bg="blue",fg="white",font=("arial",12)).place(x=100,y=320)
-        Label(self.root,text="BÚSQUEDA FINALIZADA",bg="blue",fg="white",font=("arial",12)).place(x=150,y=370)        
+        Label(self.root,text="BÚSQUEDA FINALIZADA",bg="lightblue",fg="black",font=("arial",12)).place(x=150,y=370)        
         Button(self.root,text='Reiniciar',font=("arial",10),command=self.InputData).place(x=200,y=420)
         if p!=None:
-            l=Label(self.root,text=f'Precisión: {p}\nRecobrado: {r} \nF1: {f1value}',bg="blue",fg="white",font=("arial",10))
+            l=Label(self.root,text=f'Precisión: {p}\nRecobrado: {r} \nF1: {f1value}',bg="lightblue",fg="black",font=("arial",10))
             l.place(x=140,y=320)
             self.ShowResult(result,cranQuery)
             
@@ -203,12 +217,12 @@ class View():
         self.vr.title("Resultado del " + self.modelName) 
         self.vr.geometry("610x500"+"+"+str(540)+"+"+str(10)) 
         self.vr.resizable(0,0)
-        self.vr.config(bg="blue", bd=12, relief="sunken")
+        self.vr.config(bg="lightblue", bd=12, relief="sunken")
       
         hscrollbar = Scrollbar(self.vr, orient=HORIZONTAL)
         vscrollbar = Scrollbar(self.vr, orient=VERTICAL)
 
-        resultList=  Listbox(self.vr, height=27, width=81, bg="black",fg="white",font=("arial",10),
+        resultList=  Listbox(self.vr, height=27, width=81, bg="black",fg="black",font=("arial",10),
                                  xscrollcommand=hscrollbar.set, yscrollcommand=vscrollbar.set)
         
         hscrollbar.config(command=resultList.xview)
@@ -295,8 +309,8 @@ class View():
         if self.cQuery.get()=='1':
             pass
         else:
-            Label(text="                        ",bg="blue",height=5).place(x=200,y=320)                                
-        Label(self.root,text="BÚSQUEDA FINALIZADA",bg="blue",fg="white",font=("arial",12)).place(x=150,y=370)        
+            Label(text="                        ",bg="lightblue",height=5).place(x=200,y=320)                                
+        Label(self.root,text="BÚSQUEDA FINALIZADA",bg="lightblue",fg="black",font=("arial",12)).place(x=150,y=370)        
         Button(self.root,text='Reiniciar',font=("arial",10),command=self.InputData).place(x=200,y=420)        
 
         crw = self.crw.get()
