@@ -1,5 +1,5 @@
-from CranfieldDataset.cranfield import Qrels, Dtest, Qtest
-from CranfieldDataset.metrics import Evaluate, F1, F
+from Datasets import cisi, cranfield
+from Datasets.metrics import Evaluate, F1
 from Models.vecModel import ExcecuteModelV
 from Models.boolModel import ExcecuteModel
 from Models.lsaModel import ExcecuteModelL
@@ -18,16 +18,20 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
                 b = a.readlines()
                 if(len(b) > 1):
                     content.append([b[0], b[1]])           
+        elif(app.cisi.get() == '1'):
+            content = cisi.Dtest()
+            cranQuery = cisi.Qtest()
+            qrels = cisi.Qrels() 
         else:
             if(app.cran.get() == '1'):
-                content = Dtest()
-                cranQuery = Qtest()
-                qrels = Qrels()  
+                content = cranfield.Dtest()
+                cranQuery = cranfield.Qtest()
+                qrels = cranfield.Qrels()  
                 
             else:
                 content = LoadFile(app.path.get())
             
-        if app.crw.get() == '1' or app.cran.get() == '1' or os.path.exists(app.path.get()):
+        if app.cisi.get() == '1' or app.crw.get() == '1' or app.cran.get() == '1' or os.path.exists(app.path.get()):
             
             if(app.mod == '1'):
                 multResults = [] 
@@ -48,7 +52,7 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
                 if(app.cQuery.get() == '2'):
                     multResults, _ = ExcecuteModelV(content, [app.query.get(1.0,"end-1c")],app.umbral)
                     return multResults,None,None,None,None
-                else: 
+                else:
                     multResults, dq = ExcecuteModelV(content,cranQuery,app.umbral)
                     p, r = Evaluate(dq, qrels)
                     f1Value = F1(p, r)
