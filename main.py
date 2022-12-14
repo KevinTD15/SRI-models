@@ -37,6 +37,7 @@ class View():
         self.umbral = None
         self.cQuery = None
         self.cisi = None
+        self.vaswani = None
         self.modelName = None
         self.coincidence = StringVar(value='0') 
         self.button = None 
@@ -75,7 +76,7 @@ class View():
         self.radio2.place(x=120,y=50)
         self.radio3=Radiobutton(text="CISI",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='3',command=self.ReadDataset)
         self.radio3.place(x=220,y=50)
-        self.radio4=Radiobutton(text="otro",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='4',command=self.ReadCrawling)
+        self.radio4=Radiobutton(text="Vaswani",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='4',command=self.ReadDataset)
         self.radio4.place(x=300,y=50)
         self.radio5=Radiobutton(text="None",bg="lightblue",fg="black",font=("arial",10), variable=self.consult, value='5',command=self.SelectPath)
         self.radio5.place(x=380,y=50)
@@ -100,7 +101,9 @@ class View():
 
     def ReadDataset(self):
         self.disableButton(True)
-        if(self.consult.get() == '3'):
+        if(self.consult.get() == '4'):
+            self.vaswani=StringVar(value='1')
+        elif(self.consult.get() == '3'):
             self.cisi=StringVar(value='1')
         else:
             self.cran=StringVar(value='1')
@@ -222,7 +225,7 @@ class View():
         hscrollbar = Scrollbar(self.vr, orient=HORIZONTAL)
         vscrollbar = Scrollbar(self.vr, orient=VERTICAL)
 
-        resultList=  Listbox(self.vr, height=27, width=81, bg="black",fg="black",font=("arial",10),
+        resultList=  Listbox(self.vr, height=27, width=81, bg="black",fg="white",font=("arial",10),
                                  xscrollcommand=hscrollbar.set, yscrollcommand=vscrollbar.set)
         
         hscrollbar.config(command=resultList.xview)
