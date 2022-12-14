@@ -11,11 +11,9 @@ Facultad de Matemática y Computación
 Universidad de La Habana
 Curso 2021-2022
 
-
-
 Manual de usuario:
 
-***Ver en informe.pdf***
+**Ver en informe.pdf**
 
 Nota:
 Para usar el Crawling es necesaio estar conectado a internet.
