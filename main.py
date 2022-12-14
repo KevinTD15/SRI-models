@@ -258,8 +258,9 @@ class View():
                         resultList.insert(END ,'NO SE ENCONTRARON COINCIDENCIAS')
                     else: #OJOOOO el ese lo puse yo preguntar
                         for i in result[j]:
-                            if i[1] != 0:
-                                resultList.insert(END ,"Artículo: " + i)
+                            if len(i) >= 1:
+                                if i[1] != 0:
+                                    resultList.insert(END ,"Artículo: " + i)
                         
         elif self.mod=='2':
             if self.cQuery.get()=='2':
