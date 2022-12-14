@@ -1,4 +1,4 @@
-from Datasets import cisi, cranfield
+from Datasets import cisi, cranfield, vaswani
 from Datasets.metrics import Evaluate, F1
 from Models.vecModel import ExcecuteModelV
 from Models.boolModel import ExcecuteModel
@@ -22,6 +22,10 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
             content = cisi.Dtest()
             cranQuery = cisi.Qtest()
             qrels = cisi.Qrels() 
+        elif(app.vaswani.get() == '1'):
+            content = vaswani.Dtest()
+            cranQuery = vaswani.Qtest()
+            qrels = vaswani.Qrels() 
         else:
             if(app.cran.get() == '1'):
                 content = cranfield.Dtest()
@@ -31,7 +35,7 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
             else:
                 content = LoadFile(app.path.get())
             
-        if app.cisi.get() == '1' or app.crw.get() == '1' or app.cran.get() == '1' or os.path.exists(app.path.get()):
+        if app.vaswani.get() == '1' or app.cisi.get() == '1' or app.crw.get() == '1' or app.cran.get() == '1' or os.path.exists(app.path.get()):
             
             if(app.mod == '1'):
                 multResults = [] 
