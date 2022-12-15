@@ -17,8 +17,9 @@ Manual de usuario:
 
 Nota:
 Para usar el Crawling es necesaio estar conectado a internet.
-OJO: Si el firewall está activado hay que darle conección a:
- -vscode
- -navegador(chrome, firefox, opera, etc)
 
-1- Modelos: Booleano, Vectorial, LSA
+OJO: Si el firewall está activado hay que darle conección a:
+
+-vscode
+
+-navegador(chrome, firefox, opera, etc)
