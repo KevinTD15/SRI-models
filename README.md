@@ -11,6 +11,8 @@ Facultad de Matemática y Computación
 Universidad de La Habana
 Curso 2021-2022
 
+Instalar dependencias: pip install -r requirements.txt
+
 Manual de usuario:
 
 --La ejecución se inicia al es escribir: python main.py en la consola
