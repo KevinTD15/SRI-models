@@ -40,7 +40,7 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
             if(app.mod == '1'):
                 multResults = [] 
                        
-                if(app.cQuery.get() == '2'): #ver si el query parametro es app. o no
+                if(app.cQuery.get() == '2'): 
                     multResults, _ = ExcecuteModel(content, [app.query.get(1.0,"end-1c")], app.queryMode.get(), app.coincidence.get())
                     return multResults,None,None,None,None
 
@@ -54,10 +54,10 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
             elif(app.mod == '2'):
                 multResults = []
                 if(app.cQuery.get() == '2'):
-                    multResults, _ = ExcecuteModelV(content, [app.query.get(1.0,"end-1c")],app.umbral)
+                    multResults, _ = ExcecuteModelV(content, [app.query.get(1.0,"end-1c")],app.umbral.get())
                     return multResults,None,None,None,None
                 else:
-                    multResults, dq = ExcecuteModelV(content,cranQuery,app.umbral)
+                    multResults, dq = ExcecuteModelV(content,cranQuery,app.umbral.get())
                     p, r = Evaluate(dq, qrels)
                     f1Value = F1(p, r)
                     return multResults,p,r,f1Value,cranQuery
@@ -66,12 +66,12 @@ def CallModel(app): #crw,time,cran,path,mod,cQuery,queryMode,coincidence,query,k
                 multResults = []
 
                 if(app.cQuery.get() == '2'):
-                    multResults, _ = ExcecuteModelL(content, [app.query.get(1.0,"end-1c")], app.k.get(),app.umbral)
+                    multResults, _ = ExcecuteModelL(content, [app.query.get(1.0,"end-1c")], app.k.get(),app.umbral.get())
                     return multResults,None,None,None,None
 
                 else:          
                     query = cranQuery         
-                    multResults, dq = ExcecuteModelL(content, query, app.k.get(),app.umbral) 
+                    multResults, dq = ExcecuteModelL(content, query, app.k.get(),app.umbral.get()) 
                     p, r = Evaluate(dq, qrels)
                     f1Value = F1(p, r)
                     return multResults,p,r, f1Value, cranQuery
