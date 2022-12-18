@@ -12,24 +12,24 @@ reserved = ["|", "&", "~", "(", ")"]
 DICT = tDict[str, Any]
 keywordsSympy = {}
 
-def loadKeywords(keywordsSympy: Optional[DICT] = None):
+def LoadKeywords(keywordsSympy: Optional[DICT] = None):
     exec('from sympy import *', keywordsSympy)
     builtins_dict = vars(builtins)
     for name, obj in builtins_dict.items():
         if isinstance(obj, types.BuiltinFunctionType):
             keywordsSympy[name] = obj
 
-def eliminaKeywords(cadena, keywords):
+def DeleteKeywords(cadena, keywords):
     cadenaSinKeywords=""   
     band=False
-    otrasKeys = ['else','round','input', 'Integer' ]
+    otrasKeys = ['else','round','input', 'Integer', 'yield','``' ,'except','global','continue','class','finally','pass']
     
     if len(cadena)>0:
         for i in cadena.split(' '):
             if band: 
                 band=False
                 continue
-            if  i in keywords or i in otrasKeys or (i[0]>='0' and i[0]<='9'):
+            if (i is not None) and (i in keywords or i in otrasKeys or (i[0]>='0' and i[0]<='9')):
                 band=True
             else:
                 if cadenaSinKeywords=="": 
@@ -140,16 +140,17 @@ def ExcecuteModel(content, query, queryMode, coincidence):
     normalizedContent = CleanAllTokens(content)
     normalizedContent = tuple([tuple(x) for x in normalizedContent])
     docXTerm = DocXTerm(normalizedContent)
-    loadKeywords(keywordsSympy)
+    LoadKeywords(keywordsSympy)
     docs = []
     dq = []
+    #OJOOOOO si querymode=1 da error de normalizequery util........., esta claro,se pone dde esta 0 1 tamb?
     for q in range(len(query)):
         if(queryMode == '2'):
             normalizedQuery = NormalizeQuery(query[q])
         elif(queryMode == '1'):
             cleanedQuery = CleanToken(query[q], True)
             normalizedQuery = ToAndForm(cleanedQuery)
-        normalizedQuery=eliminaKeywords(normalizedQuery,keywordsSympy)
+        normalizedQuery=DeleteKeywords(normalizedQuery,keywordsSympy)
         ToSymbol(normalizedQuery)
         queryFnd = to_dnf(normalizedQuery)
         if((type(queryFnd) is And) and coincidence == '2'):
