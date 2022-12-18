@@ -2,6 +2,7 @@
 
 En este repo están implementados 3 sistemas de recuperacion de informacion, el modelo booleano, el vectorial y el análisis de semántica latente
 
+
 Proyecto de Sistemas de Recuperación de Información
 Modelo booleano, vectorial y ...
 
@@ -11,14 +12,16 @@ Facultad de Matemática y Computación
 Universidad de La Habana
 Curso 2021-2022
 
-Manual de usuario:
+Manual de usuario: **Ver en informe.pdf**
 
-**Ver en informe.pdf**
+Instalar dependencias: pip install -r requirements.txt
 
 Nota:
-Para usar el Crawling es necesaio estar conectado a internet.
-OJO: Si el firewall está activado hay que darle conección a:
- -vscode
- -navegador(chrome, firefox, opera, etc)
 
-1- Modelos: Booleano, Vectorial, LSA
+Para usar el Crawling es necesaio estar conectado a internet.
+
+OJO: Si el firewall está activado hay que darle conección a:
+
+    -vscode
+
+    -navegador(chrome, firefox, opera, etc)
