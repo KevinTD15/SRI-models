@@ -65,6 +65,8 @@ def FreqTable(normalizedContent):
 
 def NormalizeFTQuery(qft):
     '''Normaliza los terminos de la query'''
+    if(len(qft) <= 0):
+        return qft
     maxV = max(qft, key=lambda item: item[1])
     for i in range(len(qft)):
         qft[i][1] = qft[i][1]/maxV[1]
