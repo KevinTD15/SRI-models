@@ -14,6 +14,13 @@ Curso 2021-2022
 
 Manual de usuario: **Ver en informe.pdf**
 
+Links de Base de Datos:
+
+1- Cranfield: http://ir.dcs.gla.ac.uk/resources/test_collections/cran/cran.tar.gz
+
+2- Vaswani: http://ir.dcs.gla.ac.uk/resources/test_collections/npl/npl.tar.gz
+
+
 Instalar dependencias: pip install -r requirements.txt
 
 Nota:
